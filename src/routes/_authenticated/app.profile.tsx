@@ -1,3 +1,4 @@
+import { normaliseNigerianPhone } from "@/lib/validation";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -30,7 +31,11 @@ function Profile() {
   }, [me?.profile]);
 
   const save = useMutation({
-    mutationFn: () => updateMyProfile(name, phone),
+    mutationFn: () => {
+      const n = normaliseNigerianPhone(phone);
+      if (!n) throw new Error("Enter a valid 11-digit Nigerian mobile number, e.g. 08031234567");
+      return updateMyProfile(name, n);
+    },
     onSuccess: () => {
       toast.success("Profile saved");
       qc.invalidateQueries({ queryKey: ["me"] });

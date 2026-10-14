@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
   CalendarClock,
+  DoorOpen,
+  ShieldCheck,
   ClipboardList,
   LayoutGrid,
   ReceiptText,
@@ -32,6 +34,7 @@ function AdminLayout() {
     { to: "/admin", label: "Overview", icon: LayoutGrid, exact: true },
     { to: "/admin/verify", label: "Verify membership", icon: ScanLine },
     { to: "/admin/members", label: "Members", icon: Users },
+    { to: "/admin/check-ins", label: "Check-ins", icon: DoorOpen },
     ...(admin
       ? [
           {
@@ -45,6 +48,9 @@ function AdminLayout() {
           { to: "/admin/reports", label: "Reports", icon: BarChart3 },
           { to: "/admin/logs", label: "Activity logs", icon: ClipboardList },
           { to: "/admin/settings", label: "Settings", icon: Settings },
+          ...(me?.isSuperAdmin
+            ? [{ to: "/admin/staff", label: "Staff accounts", icon: ShieldCheck }]
+            : []),
         ]
       : []),
   ];

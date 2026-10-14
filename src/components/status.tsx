@@ -165,7 +165,7 @@ export function Stat({
   tone?: "danger" | "warning" | "success";
 }) {
   return (
-    <div className="panel p-4">
+    <div className="panel lift p-4">
       <div className="flex items-center gap-2">
         {tone && (
           <span

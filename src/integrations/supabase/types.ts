@@ -47,6 +47,30 @@ export type Database = {
         }
         Relationships: []
       }
+      check_ins: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          plan_name: string | null
+          staff_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          plan_name?: string | null
+          staff_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          plan_name?: string | null
+          staff_id?: string
+        }
+        Relationships: []
+      }
       gym_settings: {
         Row: {
           expiring_soon_days: number
@@ -404,6 +428,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      admit_member: { Args: { _member: string }; Returns: Json }
       approve_payment: {
         Args: { _plan: string; _request: string }
         Returns: Json
@@ -479,7 +504,7 @@ export type Database = {
     }
     Enums: {
       access_state: "normal" | "suspended" | "cancelled"
-      app_role: "admin" | "reception" | "member"
+      app_role: "admin" | "reception" | "member" | "super_admin"
       duration_unit: "days" | "months"
       payment_status: "pending" | "approved" | "rejected" | "clarification"
     }
@@ -610,7 +635,7 @@ export const Constants = {
   public: {
     Enums: {
       access_state: ["normal", "suspended", "cancelled"],
-      app_role: ["admin", "reception", "member"],
+      app_role: ["admin", "reception", "member", "super_admin"],
       duration_unit: ["days", "months"],
       payment_status: ["pending", "approved", "rejected", "clarification"],
     },

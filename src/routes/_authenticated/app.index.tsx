@@ -128,7 +128,7 @@ function Dashboard() {
               </p>
               <Button asChild className="mt-6" size="lg">
                 <Link to="/app/renew">
-                  Choose a plan <ArrowRight />
+                  Activate membership <ArrowRight />
                 </Link>
               </Button>
             </>

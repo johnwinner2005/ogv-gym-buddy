@@ -1,15 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  meQuery,
   saveSettings,
-  searchMembers,
-  setRole,
   settingsQuery,
-  staffQuery,
   type Settings,
 } from "@/lib/api";
 import { errMessage, setGymTimezone } from "@/lib/format";
@@ -148,100 +144,6 @@ function SettingsPage() {
           </Button>
         </form>
       )}
-      <Staff />
     </div>
-  );
-}
-
-function Staff() {
-  const qc = useQueryClient();
-  const { data: me } = useQuery(meQuery);
-  const staff = useQuery(staffQuery);
-  const [q, setQ] = useState("");
-  const [results, setResults] = useState<Awaited<ReturnType<typeof searchMembers>>>([]);
-  const m = useMutation({
-    mutationFn: (a: { id: string; role: "admin" | "reception"; grant: boolean }) =>
-      setRole(a.id, a.role, a.grant),
-    onSuccess: () => {
-      toast.success("Staff roles updated");
-      qc.invalidateQueries({ queryKey: ["admin", "staff"] });
-    },
-    onError: (e) => toast.error(errMessage(e)),
-  });
-  return (
-    <section className="panel mt-6 p-5">
-      <h2 className="font-medium">Staff access</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Reception can verify members only. Administrators can also approve payments and change
-        memberships. Staff first register as a normal account.
-      </p>
-      <ul className="mt-4 divide-y rounded-md border">
-        {staff.data?.map((p) => (
-          <li key={p.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-            <div className="min-w-0 flex-1">
-              <p className="font-medium">{p.full_name}</p>
-              <p className="text-xs text-muted-foreground">{p.email}</p>
-            </div>
-            {(["admin", "reception"] as const).map((r) =>
-              p.roles.includes(r) ? (
-                <Button
-                  key={r}
-                  size="sm"
-                  variant="outline"
-                  disabled={m.isPending || (r === "admin" && p.id === me?.user.id)}
-                  onClick={() => m.mutate({ id: p.id, role: r, grant: false })}
-                >
-                  Remove {r}
-                </Button>
-              ) : null,
-            )}
-          </li>
-        ))}
-      </ul>
-      <form
-        className="mt-4 flex gap-2"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          try {
-            setResults(await searchMembers(q));
-          } catch (err) {
-            toast.error(errMessage(err));
-          }
-        }}
-      >
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Find an account by email or name"
-          />
-        </div>
-        <Button type="submit" variant="outline">
-          Find
-        </Button>
-      </form>
-      {results.map((r) => (
-        <div
-          key={r.id}
-          className="mt-2 flex flex-wrap items-center gap-2 rounded-md bg-muted px-4 py-2.5 text-sm"
-        >
-          <span className="flex-1">
-            {r.full_name} · {r.email}
-          </span>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => m.mutate({ id: r.id, role: "reception", grant: true })}
-          >
-            Make reception
-          </Button>
-          <Button size="sm" onClick={() => m.mutate({ id: r.id, role: "admin", grant: true })}>
-            Make admin
-          </Button>
-        </div>
-      ))}
-    </section>
   );
 }

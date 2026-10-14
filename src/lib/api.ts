@@ -7,7 +7,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { DurationUnit, MembershipStatus, RenewalRule } from "./membership";
 
-export type Role = "admin" | "reception" | "member";
+export type Role = "super_admin" | "admin" | "reception" | "member";
 
 export interface StatusResult {
   status: MembershipStatus | "not_found";
@@ -71,6 +71,7 @@ export const meQuery = queryOptions({
       user: u.user,
       roles: r,
       isAdmin: r.includes("admin"),
+      isSuperAdmin: r.includes("super_admin"),
       isStaff: r.includes("admin") || r.includes("reception"),
       profile: profile.data,
     };
@@ -490,7 +491,7 @@ export const staffQuery = queryOptions({
   queryKey: ["admin", "staff"],
   queryFn: async () => {
     const roles = unwrap<{ user_id: string; role: Role }[]>(
-      await supabase.from("user_roles").select("user_id, role").in("role", ["admin", "reception"]),
+      await supabase.from("user_roles").select("user_id, role").in("role", ["super_admin", "admin", "reception"]),
     );
     const ids = [...new Set(roles.map((r) => r.user_id))];
     const profiles = ids.length
@@ -511,4 +512,32 @@ export const memberStatusQuery = (id: string) =>
     queryKey: ["admin", "member-status", id],
     queryFn: async () =>
       unwrap<StatusResult>(await supabase.rpc("staff_member_status", { _member: id })),
+  });
+
+export async function admitMember(id: string) {
+  return unwrap<{ id: string; created_at: string }>(
+    await supabase.rpc("admit_member", { _member: id }),
+  );
+}
+
+export const checkInsQuery = (memberId: string | null, page = 0) =>
+  queryOptions({
+    queryKey: ["check-ins", memberId, page],
+    queryFn: async () => {
+      let q = supabase
+        .from("check_ins")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(page * 30, page * 30 + 29);
+      if (memberId) q = q.eq("member_id", memberId);
+      const res = await q;
+      if (res.error) throw new Error(res.error.message);
+      const ids = [...new Set(res.data.flatMap((r) => [r.member_id, r.staff_id]))];
+      const profiles = ids.length
+        ? ((await supabase.from("profiles").select("id, full_name, member_code").in("id", ids))
+            .data ?? [])
+        : [];
+      const map = new Map(profiles.map((p) => [p.id, p]));
+      return { rows: res.data, count: res.count ?? 0, people: map };
+    },
   });

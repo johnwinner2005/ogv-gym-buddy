@@ -3,7 +3,7 @@ import { History, Home, RefreshCw, UserRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { AppShell } from "@/components/shell";
-import { settingsQuery, syncMyNotices } from "@/lib/api";
+import { myStatusQuery, settingsQuery, syncMyNotices } from "@/lib/api";
 
 export const Route = createFileRoute("/_authenticated/app")({
   component: MemberLayout,
@@ -11,6 +11,8 @@ export const Route = createFileRoute("/_authenticated/app")({
 
 function MemberLayout() {
   const { data: settings } = useQuery(settingsQuery);
+  const { data: status } = useQuery(myStatusQuery);
+  const firstTime = !status || status.status === "none";
   useEffect(() => {
     syncMyNotices().catch(() => {});
   }, []);
@@ -19,7 +21,7 @@ function MemberLayout() {
       area="member"
       nav={[
         { to: "/app", label: "Dashboard", icon: Home, exact: true },
-        { to: "/app/renew", label: "Renew membership", icon: RefreshCw },
+        { to: "/app/renew", label: firstTime ? "Activate membership" : "Renew membership", icon: RefreshCw },
         { to: "/app/history", label: "Payments & history", icon: History },
         { to: "/app/profile", label: "Profile", icon: UserRound },
       ]}

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { Loader2, MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { checkEmail } from "@/lib/accounts.functions";
+import { emailProblem, normaliseNigerianPhone } from "@/lib/validation";
 import { AuthLayout, FieldError } from "@/components/auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,11 +25,20 @@ export const Route = createFileRoute("/register")({
 const schema = z
   .object({
     full_name: z.string().trim().min(2, "Enter your full name").max(120),
-    email: z.string().trim().email("Enter a valid email address").max(255),
+    email: z
+      .string()
+      .trim()
+      .max(255)
+      .superRefine((v, ctx) => {
+        const p = emailProblem(v);
+        if (p) ctx.addIssue({ code: "custom", message: p });
+      }),
     phone: z
       .string()
       .trim()
-      .regex(/^\+?[0-9 ()-]{7,20}$/, "Enter a valid phone number"),
+      .refine((v) => normaliseNigerianPhone(v) !== null, {
+        message: "Enter a valid 11-digit Nigerian mobile number, e.g. 08031234567",
+      }),
     password: z
       .string()
       .min(8, "Use at least 8 characters")
@@ -63,12 +74,22 @@ function Register() {
     }
     setErrors({});
     setLoading(true);
+    const ec = await checkEmail({ data: { email: parsed.data.email } }).catch(() => ({
+      ok: true,
+      message: "",
+    }));
+    if (!ec.ok) {
+      setLoading(false);
+      setErrors({ email: ec.message });
+      return;
+    }
+    const phone = normaliseNigerianPhone(parsed.data.phone)!;
     const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
         emailRedirectTo: window.location.origin + "/app",
-        data: { full_name: parsed.data.full_name, phone: parsed.data.phone },
+        data: { full_name: parsed.data.full_name, phone },
       },
     });
     setLoading(false);
@@ -142,7 +163,9 @@ function Register() {
               value={form[k]}
               onChange={set(k)}
               aria-invalid={!!errors[k]}
-              placeholder={k === "phone" ? "+234 803 000 0000" : undefined}
+              placeholder={k === "phone" ? "08031234567" : undefined}
+              maxLength={k === "phone" ? 14 : undefined}
+              inputMode={k === "phone" ? "tel" : undefined}
             />
             <FieldError>{errors[k]}</FieldError>
           </div>

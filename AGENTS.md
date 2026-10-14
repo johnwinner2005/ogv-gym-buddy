@@ -14,6 +14,7 @@
 - The browser calls those functions via the Supabase client RPC; it never writes membership periods, payment status or profile access fields (no grants/policies allow it).
 - `src/lib/membership.ts` mirrors the SQL rules for previews only and is unit-tested; change both together.
 - Approval idempotency relies on `FOR UPDATE` + status check + unique `membership_periods.payment_request_id`.
-- Roles live in `user_roles`; the first account ever created is bootstrapped as admin by the signup trigger.
+- Roles live in `user_roles`; signup only grants `member`. Only `super_admin` can grant/revoke `admin` (enforced in `admin_set_role`); staff accounts are created via the super-admin-only server fn in `src/lib/accounts.functions.ts`.
+- Gym entry is recorded only via `admit_member` (re-checks live status) into `check_ins`.
 - Receipts are in the private `receipts` bucket under `<member_id>/…`; admins read via short-lived signed URLs.
 - Server-side rule tests: `supabase/tests/membership_rules.sql` (rolls back); unit tests: `bunx vitest run`.

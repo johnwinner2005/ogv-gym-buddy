@@ -36,6 +36,13 @@
       "when": 1791976155610,
       "tag": "0004_super_admin_checkins_fixes",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792005170693,
+      "tag": "0005_access_pass_credentials",
+      "breakpoints": true
     }
   ]
 }

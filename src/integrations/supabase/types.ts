@@ -104,6 +104,47 @@ export type Database = {
         }
         Relationships: []
       }
+      member_credentials: {
+        Row: {
+          id: string
+          issued_at: string
+          member_id: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          token: string
+        }
+        Insert: {
+          id?: string
+          issued_at?: string
+          member_id: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          token: string
+        }
+        Update: {
+          id?: string
+          issued_at?: string
+          member_id?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_credentials_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       membership_periods: {
         Row: {
           created_at: string
@@ -351,6 +392,7 @@ export type Database = {
           created_at: string
           id: string
           member_id: string | null
+          method: string
           result: string
           staff_id: string
         }
@@ -358,6 +400,7 @@ export type Database = {
           created_at?: string
           id?: string
           member_id?: string | null
+          method?: string
           result: string
           staff_id: string
         }
@@ -365,10 +408,65 @@ export type Database = {
           created_at?: string
           id?: string
           member_id?: string | null
+          method?: string
           result?: string
           staff_id?: string
         }
         Relationships: []
+      }
+      wallet_passes: {
+        Row: {
+          credential_id: string
+          first_issued_at: string
+          id: string
+          issue_count: number
+          last_error: string | null
+          last_issued_at: string
+          member_id: string
+          provider: string
+          provider_ref: string
+          status: string
+        }
+        Insert: {
+          credential_id: string
+          first_issued_at?: string
+          id?: string
+          issue_count?: number
+          last_error?: string | null
+          last_issued_at?: string
+          member_id: string
+          provider: string
+          provider_ref: string
+          status?: string
+        }
+        Update: {
+          credential_id?: string
+          first_issued_at?: string
+          id?: string
+          issue_count?: number
+          last_error?: string | null
+          last_issued_at?: string
+          member_id?: string
+          provider?: string
+          provider_ref?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_passes_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "member_credentials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_passes_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -434,6 +532,7 @@ export type Database = {
         Returns: Json
       }
       compute_status: { Args: { _member: string }; Returns: Json }
+      get_my_pass: { Args: never; Returns: Json }
       get_my_status: { Args: never; Returns: Json }
       has_role: {
         Args: {
@@ -443,6 +542,25 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      issue_credential: {
+        Args: { _member: string }
+        Returns: {
+          id: string
+          issued_at: string
+          member_id: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          token: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "member_credentials"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       log_audit: {
         Args: {
           _action: string
@@ -453,6 +571,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      new_pass_token: { Args: never; Returns: string }
       next_period_start: {
         Args: { _member: string; _rule: string }
         Returns: string
@@ -475,12 +594,20 @@ export type Database = {
         }
         Returns: Json
       }
+      record_wallet_issue: {
+        Args: { _credential: string; _provider: string; _ref: string }
+        Returns: undefined
+      }
       respond_clarification: {
         Args: { _note: string; _request: string }
         Returns: undefined
       }
       review_payment: {
         Args: { _decision: string; _note: string; _request: string }
+        Returns: undefined
+      }
+      rotate_credential: {
+        Args: { _member: string; _reason: string }
         Returns: undefined
       }
       search_members: {
@@ -501,6 +628,7 @@ export type Database = {
         Returns: undefined
       }
       verify_member: { Args: { _member: string }; Returns: Json }
+      verify_pass: { Args: { _token: string }; Returns: Json }
     }
     Enums: {
       access_state: "normal" | "suspended" | "cancelled"

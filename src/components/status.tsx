@@ -207,13 +207,8 @@ export function PageHeader({
 export function Logo({ className, inverted }: { className?: string; inverted?: boolean }) {
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <div
-        className={cn(
-          "grid size-8 place-items-center rounded-md font-display text-[13px] font-bold",
-          inverted ? "bg-ink-foreground text-ink" : "bg-primary text-primary-foreground",
-        )}
-      >
-        OGV
+      <div className="size-9 shrink-0">
+        <img src={logoSrc} alt="" className="h-full w-full object-contain" />
       </div>
       <div className="leading-none">
         <div className="font-display text-[15px] font-semibold">OGV Gym</div>

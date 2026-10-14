@@ -32,7 +32,6 @@ const schema = z
       .string()
       .min(8, "Use at least 8 characters")
       .max(128)
-      .regex(/[A-Za-z]/, "Include at least one letter")
       .regex(/[0-9]/, "Include at least one number"),
     confirm: z.string(),
   })

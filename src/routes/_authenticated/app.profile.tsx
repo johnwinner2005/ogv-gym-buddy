@@ -39,7 +39,7 @@ function Profile() {
   });
   const changePw = useMutation({
     mutationFn: async () => {
-      if (pw.next.length < 8 || !/[A-Za-z]/.test(pw.next) || !/[0-9]/.test(pw.next))
+      if (pw.next.length < 8 || !/[0-9]/.test(pw.next))
         throw new Error("Use at least 8 characters with a letter and a number");
       const { error } = await supabase.auth.updateUser({
         password: pw.next,

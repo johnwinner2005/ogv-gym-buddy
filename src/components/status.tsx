@@ -1,3 +1,4 @@
+import logoSrc from "@/assets/ogv-logo.svg";
 import {
   Ban,
   CircleCheck,

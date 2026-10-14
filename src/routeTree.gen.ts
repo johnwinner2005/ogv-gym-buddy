@@ -34,6 +34,7 @@ import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppRenewRouteImport } from './routes/_authenticated/app.renew'
 import { Route as AuthenticatedAdminMembersIndexRouteImport } from './routes/_authenticated/admin.members.index'
 import { Route as AuthenticatedAdminMembersIdRouteImport } from './routes/_authenticated/admin.members.$id'
+import { Route as ApiPublicWalletAppleRouteImport } from './routes/api/public/wallet.apple'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -168,6 +169,11 @@ const AuthenticatedAdminMembersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminMembersRoute,
   } as any)
+const ApiPublicWalletAppleRoute = ApiPublicWalletAppleRouteImport.update({
+  id: '/api/public/wallet/apple',
+  path: '/api/public/wallet/apple',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/admin/members/': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/admin/members': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRoutesById {
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/_authenticated/admin/members/': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRouteTypes {
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/admin/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/admin/members'
   id:
     | '__root__'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/_authenticated/admin/members/'
   fileRoutesById: FileRoutesById
 }
@@ -332,6 +344,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicWalletAppleRoute: typeof ApiPublicWalletAppleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembersIdRouteImport
       parentRoute: typeof AuthenticatedAdminMembersRoute
     }
+    '/api/public/wallet/apple': {
+      id: '/api/public/wallet/apple'
+      path: '/api/public/wallet/apple'
+      fullPath: '/api/public/wallet/apple'
+      preLoaderRoute: typeof ApiPublicWalletAppleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -598,6 +618,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicWalletAppleRoute: ApiPublicWalletAppleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

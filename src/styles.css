@@ -201,3 +201,10 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Footer logo: gentle lift + tilt on hover/tap, logo artwork itself untouched */
+.logo-bounce { transition: transform 400ms cubic-bezier(.34,1.56,.64,1), filter 400ms ease; cursor: pointer; }
+.logo-bounce:hover, .logo-bounce:focus-visible { transform: translateY(-4px) rotate(-6deg) scale(1.08); filter: drop-shadow(0 8px 14px color-mix(in oklab, var(--foreground) 18%, transparent)); }
+.logo-bounce:active { animation: logo-pop 500ms cubic-bezier(.34,1.56,.64,1); }
+@keyframes logo-pop { 0% { transform: scale(1); } 40% { transform: scale(.9) rotate(6deg); } 100% { transform: scale(1.08) rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) { .logo-bounce, .logo-bounce:hover, .logo-bounce:active { transition: none; animation: none; transform: none; } }

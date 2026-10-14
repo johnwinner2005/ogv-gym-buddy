@@ -1,3 +1,4 @@
+import { BrandFooter } from "@/components/brand-footer";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, QrCode, ReceiptText, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -103,6 +104,7 @@ function Index() {
           ))}
         </section>
       </main>
+      <BrandFooter />
     </div>
   );
 }

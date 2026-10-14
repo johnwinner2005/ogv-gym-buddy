@@ -1,3 +1,4 @@
+import logoSrc from "@/assets/ogv-logo.svg";
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/status";
@@ -26,7 +27,7 @@ export function AuthLayout({
           <div className="mt-8">{children}</div>
           {footer && <div className="mt-8 text-sm text-muted-foreground">{footer}</div>}
         </div>
-        <p className="text-xs text-muted-foreground">© OGV Gym</p>
+        <div className="flex items-center gap-2"><img src={logoSrc} alt="" className="logo-bounce size-6" /><p className="text-xs text-muted-foreground">© OGV Gym</p></div>
       </div>
       <div className="relative hidden overflow-hidden lg:block">
         <img src={gym} alt="" className="absolute inset-0 h-full w-full object-cover" />

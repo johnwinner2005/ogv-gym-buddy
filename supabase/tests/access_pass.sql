@@ -17,9 +17,9 @@ BEGIN
   ASSERT r->>'decision' = CASE (public.staff_member_status(m)->>'status') WHEN 'active' THEN 'granted' WHEN 'expired' THEN 'expired' WHEN 'suspended' THEN 'suspended' WHEN 'cancelled' THEN 'cancelled' ELSE 'no_membership' END, 'live status decides';
   ASSERT public.verify_pass('OGV1.nope')->>'decision' = 'invalid_pass', 'unknown denied';
   -- expired member keeps pass but is denied
-  UPDATE public.profiles SET access_state='suspended' WHERE id=m;
+  PERFORM public.admin_set_access_state(m, 'suspended', 'test');
   ASSERT public.verify_pass(tok)->>'decision' = 'suspended', 'suspended denied';
-  UPDATE public.profiles SET access_state='normal' WHERE id=m;
+  PERFORM public.admin_set_access_state(m, 'normal', 'test');
   PERFORM public.rotate_credential(m, 'lost phone');
   ASSERT public.verify_pass(tok)->>'decision' = 'revoked_pass', 'revoked denied';
   ASSERT (SELECT count(*) FROM public.verification_logs WHERE staff_id=staff AND method='pass' AND created_at > now() - interval '1 minute') >= 4, 'logged';

@@ -1,13 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
-import { Check, Copy, Expand, Loader2, MapPin, CalendarDays, RotateCcw, ShieldAlert, Wallet } from "lucide-react";
+import { useState } from "react";
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
+import { Check, Copy, Download, Expand, Loader2, MapPin, CalendarDays, RotateCcw, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import logoSrc from "@/assets/ogv-logo.svg";
 import { meQuery, myPassQuery, replacePass } from "@/lib/api";
-import { getWalletConfig, issueApplePass, issueGooglePass } from "@/lib/wallet.functions";
 import { errMessage, fmtDate, fmtLongDate } from "@/lib/format";
 import { ErrorState } from "@/components/status";
 import { Button } from "@/components/ui/button";
@@ -29,15 +27,8 @@ export const Route = createFileRoute("/_authenticated/app/pass")({
 
 function PassPage() {
   const pass = useQuery(myPassQuery);
-  const getCfg = useServerFn(getWalletConfig);
-  const cfg = useQuery({ queryKey: ["wallet-config"], queryFn: () => getCfg(), staleTime: 300_000 });
   const [big, setBig] = useState(false);
   const [replacing, setReplacing] = useState(false);
-  const [platform, setPlatform] = useState<"ios" | "android" | "other">("other");
-  useEffect(() => {
-    const ua = navigator.userAgent;
-    setPlatform(/iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : "other");
-  }, []);
 
   if (pass.isError) return <ErrorState error={pass.error} onRetry={() => pass.refetch()} />;
   if (!pass.data)
@@ -48,14 +39,13 @@ function PassPage() {
       </div>
     );
   const p = pass.data;
-  const has = (prov: "apple" | "google") => p.wallet.find((w) => w.provider === prov);
 
   return (
     <div className="mx-auto max-w-md animate-rise space-y-5">
       <div>
         <h1 className="text-2xl font-semibold">My access pass</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your access pass stays in your Wallet. Gym entry is subject to your current membership
+          Your access pass stays on your phone. Gym entry is subject to your current membership
           status.
         </p>
       </div>
@@ -122,40 +112,23 @@ function PassPage() {
 
       <CopyId code={p.member_code} />
 
-      {/* Wallet actions */}
       <section className="panel space-y-3 p-5">
         <h2 className="flex items-center gap-2 font-medium">
-          <Wallet className="size-4" /> Save to your phone
+          <Download className="size-4" /> Save to your phone
         </h2>
-        {cfg.isLoading ? (
-          <Skeleton className="h-24" />
-        ) : (
-          <>
-            <WalletButton
-              provider="apple"
-              ready={!!cfg.data?.apple}
-              recommended={platform === "ios"}
-              issued={has("apple")?.last_issued_at}
-            />
-            <WalletButton
-              provider="google"
-              ready={!!cfg.data?.google}
-              recommended={platform === "android"}
-              issued={has("google")?.last_issued_at}
-            />
-          </>
-        )}
+        <SaveImageButton p={p} />
+        <QRCodeCanvas id="pass-qr-canvas" value={p.token} size={640} level="M" marginSize={0} className="hidden" />
         <p className="text-xs text-muted-foreground">
-          No Wallet? Open this page at reception and tap the QR code to enlarge it. Brightness up
-          helps the scanner.
+          Saves your pass as a picture to your photos. Show it at reception, or open this page and
+          tap the QR code to enlarge it. Brightness up helps the scanner.
         </p>
       </section>
 
       <section className="panel p-5 text-sm">
         <h2 className="font-medium">Lost your phone?</h2>
         <p className="mt-1 text-muted-foreground">
-          Replace your pass and the old QR code and Wallet passes stop working straight away. Pass
-          issued {fmtDate(p.issued_at)}.
+          Replace your pass and the old QR code, including any saved pictures, stops working straight
+          away. Pass issued {fmtDate(p.issued_at)}.
         </p>
         <Button variant="outline" size="sm" className="mt-3" onClick={() => setReplacing(true)}>
           <RotateCcw /> Replace my pass
@@ -199,60 +172,91 @@ function CopyId({ code }: { code: string }) {
   );
 }
 
-function WalletButton({
-  provider,
-  ready,
-  recommended,
-  issued,
-}: {
-  provider: "apple" | "google";
-  ready: boolean;
-  recommended: boolean;
-  issued?: string;
-}) {
-  const qc = useQueryClient();
-  const fn = useServerFn(provider === "apple" ? issueApplePass : issueGooglePass);
-  const name = provider === "apple" ? "Apple Wallet" : "Google Wallet";
-  const m = useMutation({
-    mutationFn: () => fn(),
-    onSuccess: (r) => {
-      if (!r.ok) return;
-      qc.invalidateQueries({ queryKey: ["my-pass"] });
-      if (provider === "apple") window.location.href = r.url;
-      else window.open(r.url, "_blank", "noopener");
-    },
+function loadImg(src: string) {
+  return new Promise<HTMLImageElement>((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = src;
   });
-  const err = m.data && !m.data.ok ? m.data.error : m.isError ? errMessage(m.error) : "";
+}
+
+async function renderPassPng(p: { full_name: string | null; member_code: string; member_since: string }) {
+  const W = 1080, H = 1720;
+  const c = document.createElement("canvas");
+  c.width = W; c.height = H;
+  const x = c.getContext("2d")!;
+  const gold = "#C69633";
+  x.fillStyle = "#1c1c1c";
+  x.beginPath(); x.roundRect(0, 0, W, H, 64); x.fill();
+  const logo = await loadImg(logoSrc);
+  const lh = 120, lw = (logo.width / logo.height) * lh || lh;
+  x.drawImage(logo, 80, 80, lw, lh);
+  x.fillStyle = "#fafafa";
+  x.font = "700 44px 'Bricolage Grotesque', sans-serif";
+  x.fillText("O G V   G Y M", 100 + lw, 158);
+  const label = (t: string, y: number, align: CanvasTextAlign = "left", px = 80) => {
+    x.textAlign = align; x.fillStyle = "rgba(255,255,255,0.55)";
+    x.font = "500 26px Geist, sans-serif"; x.fillText(t, px, y);
+  };
+  label("MEMBER NAME", 330);
+  x.fillStyle = "#fafafa"; x.font = "600 64px 'Bricolage Grotesque', sans-serif";
+  x.fillText(p.full_name || "Member", 80, 410);
+  label("MEMBER ID", 490);
+  x.fillStyle = gold; x.font = "600 56px 'Geist Mono', monospace";
+  x.fillText(p.member_code, 80, 560);
+  const qr = document.getElementById("pass-qr-canvas") as HTMLCanvasElement | null;
+  if (!qr) throw new Error("QR not ready");
+  const s = 640, qx = (W - s) / 2, qy = 640;
+  x.fillStyle = "#ffffff";
+  x.beginPath(); x.roundRect(qx - 40, qy - 40, s + 80, s + 80, 36); x.fill();
+  x.imageSmoothingEnabled = false;
+  x.drawImage(qr, qx, qy, s, s);
+  label("MEMBER SINCE", 1480);
+  x.fillStyle = "#fafafa"; x.font = "500 38px Geist, sans-serif"; x.textAlign = "left";
+  x.fillText(fmtLongDate(p.member_since), 80, 1540);
+  label("LOCATION", 1480, "right", W - 80);
+  x.fillStyle = "#fafafa"; x.font = "500 38px Geist, sans-serif"; x.textAlign = "right";
+  x.fillText("OGV Gym", W - 80, 1540);
+  return new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("Couldn't create image"))), "image/png"));
+}
+
+function SaveImageButton({ p }: { p: { full_name: string | null; member_code: string; member_since: string } }) {
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    setBusy(true);
+    try {
+      const blob = await renderPassPng(p);
+      const name = `OGV-pass-${p.member_code}.png`;
+      const file = new File([blob], name, { type: "image/png" });
+      if (navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "OGV Gym pass" });
+          return;
+        } catch (e) {
+          if ((e as Error).name === "AbortError") return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = name; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      toast.success("Pass image saved.");
+    } catch (e) {
+      toast.error("Couldn't save the image: " + errMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
-    <div>
-      <Button
-        className="h-12 w-full justify-center bg-[oklch(0.17_0_0)] text-[oklch(0.98_0_0)] hover:bg-[oklch(0.25_0_0)]"
-        disabled={!ready || m.isPending}
-        onClick={() => m.mutate()}
-        aria-describedby={`${provider}-note`}
-      >
-        {m.isPending ? <Loader2 className="animate-spin" /> : <Wallet />}
-        {m.isPending ? "Preparing your pass…" : `Add to ${name}`}
-        {recommended && ready && !m.isPending && (
-          <span className="ml-1 rounded bg-white/15 px-1.5 text-[10px]">for this phone</span>
-        )}
-      </Button>
-      <p id={`${provider}-note`} className="mt-1 text-xs text-muted-foreground" role={err ? "alert" : undefined}>
-        {!ready
-          ? `${name} isn't set up by the gym yet — use the QR code above for now.`
-          : err
-            ? <span className="text-danger">{err} <button className="underline" onClick={() => m.mutate()}>Retry</button></span>
-            : m.data?.ok
-              ? provider === "apple"
-                ? "Pass created. If Wallet didn't open, tap the button again in Safari."
-                : "Save link opened. Confirm in Google Wallet to finish."
-              : issued
-                ? `Pass issued ${fmtDate(issued)}. Tap again to re-add it on a new phone.`
-                : provider === "apple"
-                  ? "Works on iPhone with Safari."
-                  : "Works on Android and in Chrome."}
-      </p>
-    </div>
+    <Button
+      className="h-12 w-full bg-[oklch(0.17_0_0)] text-[oklch(0.98_0_0)] hover:bg-[oklch(0.25_0_0)]"
+      disabled={busy}
+      onClick={save}
+    >
+      {busy ? <Loader2 className="animate-spin" /> : <Download />}
+      {busy ? "Preparing image…" : "Save pass to my device"}
+    </Button>
   );
 }
 

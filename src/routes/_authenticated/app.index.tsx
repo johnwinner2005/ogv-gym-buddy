@@ -215,11 +215,11 @@ function Dashboard() {
           </div>
           <p className="mt-3 font-mono text-lg font-medium">{s.member_code}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Your access pass stays in your Wallet. Gym entry is subject to your current membership
+            Your access pass stays on your phone. Gym entry is subject to your current membership
             status.
           </p>
           <Button asChild variant="outline" size="sm" className="mt-4">
-            <Link to="/app/pass">Add to Wallet</Link>
+            <Link to="/app/pass">Save my pass</Link>
           </Button>
         </section>
       </div>

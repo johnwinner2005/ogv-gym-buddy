@@ -43,7 +43,7 @@ function Reset() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (pw.length < 8 || !/[0-9]/.test(pw))
-      return setError("Use at least 8 characters with a letter and a number");
+      return setError("Use at least 8 characters including a number");
     if (pw !== confirm) return setError("Passwords don't match");
     setError("");
     setLoading(true);

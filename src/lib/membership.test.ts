@@ -5,7 +5,9 @@ const d = (s: string) => new Date(s);
 
 describe("addDuration", () => {
   it("weekly plan adds exactly 7 days", () => {
-    expect(addDuration(d("2026-10-14T09:00:00Z"), "days", 7).toISOString()).toBe("2026-10-21T09:00:00.000Z");
+    expect(addDuration(d("2026-10-14T09:00:00Z"), "days", 7).toISOString()).toBe(
+      "2026-10-21T09:00:00.000Z",
+    );
   });
   it("30 days is not the same as one calendar month", () => {
     const start = d("2026-01-15T10:00:00Z");
@@ -14,7 +16,9 @@ describe("addDuration", () => {
   });
   it("calendar month clamps to end of month", () => {
     // 31 Jan 12:00 Lagos (11:00Z) + 1 month = 28 Feb 2026
-    expect(addDuration(d("2026-01-31T11:00:00Z"), "months", 1).toISOString()).toBe("2026-02-28T11:00:00.000Z");
+    expect(addDuration(d("2026-01-31T11:00:00Z"), "months", 1).toISOString()).toBe(
+      "2026-02-28T11:00:00.000Z",
+    );
   });
   it("months are counted in the gym timezone, not UTC", () => {
     // 23:30Z on 31 Mar is 00:30 on 1 Apr in Lagos; +1 month = 1 May 00:30 Lagos
@@ -23,7 +27,9 @@ describe("addDuration", () => {
     );
   });
   it("quarterly adds three calendar months", () => {
-    expect(addDuration(d("2026-11-30T09:00:00Z"), "months", 3).toISOString()).toBe("2027-02-28T09:00:00.000Z");
+    expect(addDuration(d("2026-11-30T09:00:00Z"), "months", 3).toISOString()).toBe(
+      "2027-02-28T09:00:00.000Z",
+    );
   });
   it("rejects zero or negative durations", () => {
     expect(() => addDuration(new Date(), "days", 0)).toThrow();

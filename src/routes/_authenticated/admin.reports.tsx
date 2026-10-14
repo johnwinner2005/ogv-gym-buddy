@@ -39,7 +39,10 @@ function Reports() {
               <button
                 key={n}
                 onClick={() => setDays(n)}
-                className={cn("rounded-full border px-3 py-1.5 text-xs font-medium", days === n ? "border-foreground bg-foreground text-background" : "hover:bg-muted")}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-medium",
+                  days === n ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
+                )}
               >
                 {n === 365 ? "1 year" : `${n} days`}
               </button>
@@ -65,11 +68,16 @@ function Reports() {
                   {d.by_plan.map((p) => (
                     <li key={p.name}>
                       <div className="flex justify-between text-sm">
-                        <span>{p.name} <span className="text-muted-foreground">· {p.count}</span></span>
+                        <span>
+                          {p.name} <span className="text-muted-foreground">· {p.count}</span>
+                        </span>
                         <span className="font-medium tabular">{naira(p.revenue)}</span>
                       </div>
                       <div className="mt-1.5 h-1.5 rounded-full bg-muted">
-                        <div className="h-full rounded-full bg-brand" style={{ width: `${(Number(p.revenue) / maxRev) * 100}%` }} />
+                        <div
+                          className="h-full rounded-full bg-brand"
+                          style={{ width: `${(Number(p.revenue) / maxRev) * 100}%` }}
+                        />
                       </div>
                     </li>
                   ))}

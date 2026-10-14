@@ -1,6 +1,16 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, CalendarClock, ClipboardList, LayoutGrid, ReceiptText, ScanLine, Settings, Tags, Users } from "lucide-react";
+import {
+  BarChart3,
+  CalendarClock,
+  ClipboardList,
+  LayoutGrid,
+  ReceiptText,
+  ScanLine,
+  Settings,
+  Tags,
+  Users,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, type NavItem } from "@/components/shell";
 import { meQuery, overviewQuery } from "@/lib/api";
@@ -24,7 +34,12 @@ function AdminLayout() {
     { to: "/admin/members", label: "Members", icon: Users },
     ...(admin
       ? [
-          { to: "/admin/payments", label: "Payment verification", icon: ReceiptText, badge: ov?.pending_payments },
+          {
+            to: "/admin/payments",
+            label: "Payment verification",
+            icon: ReceiptText,
+            badge: ov?.pending_payments,
+          },
           { to: "/admin/expiry", label: "Membership expiry", icon: CalendarClock },
           { to: "/admin/plans", label: "Membership plans", icon: Tags },
           { to: "/admin/reports", label: "Reports", icon: BarChart3 },

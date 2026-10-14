@@ -72,7 +72,9 @@ function History() {
                     {fmtDate(p.starts_at)} – {fmtDateTime(p.ends_at)}
                   </p>
                 </div>
-                <span className="text-xs text-muted-foreground">{p.source === "payment" ? "Paid renewal" : "Set by gym"}</span>
+                <span className="text-xs text-muted-foreground">
+                  {p.source === "payment" ? "Paid renewal" : "Set by gym"}
+                </span>
               </li>
             ))}
           </ul>
@@ -95,7 +97,13 @@ function Reply({ id }: { id: string }) {
   });
   return (
     <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-      <Textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Your reply to the gym" maxLength={800} />
+      <Textarea
+        rows={2}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="Your reply to the gym"
+        maxLength={800}
+      />
       <Button onClick={() => m.mutate()} disabled={note.trim().length < 2 || m.isPending}>
         {m.isPending && <Loader2 className="animate-spin" />}
         Send reply

@@ -1,8 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { QRCodeSVG } from "qrcode.react";
-import { AlertTriangle, ArrowRight, CalendarDays, Clock, MessageCircleQuestion, XCircle } from "lucide-react";
-import { meQuery, memberPaymentsQuery, myPeriodsQuery, myStatusQuery, settingsQuery } from "@/lib/api";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  MessageCircleQuestion,
+  XCircle,
+} from "lucide-react";
+import {
+  meQuery,
+  memberPaymentsQuery,
+  myPeriodsQuery,
+  myStatusQuery,
+  settingsQuery,
+} from "@/lib/api";
 import { daysRemaining } from "@/lib/membership";
 import { fmtDate, fmtDateTime, fmtLongDate, naira } from "@/lib/format";
 import { ErrorState, StatusBadge } from "@/components/status";
@@ -35,10 +48,21 @@ function Dashboard() {
   const first = (me.profile?.full_name || "").split(" ")[0];
   const days = daysRemaining(s.expires_at);
   const latest = payments.data?.[0];
-  const open = payments.data?.filter((p) => p.status === "pending" || p.status === "clarification") ?? [];
-  const totalMs = s.starts_at && s.expires_at ? new Date(s.expires_at).getTime() - new Date(s.starts_at).getTime() : 0;
-  const pct = totalMs > 0 ? Math.min(100, Math.max(0, ((Date.now() - new Date(s.starts_at!).getTime()) / totalMs) * 100)) : 0;
-  const soon = s.status === "active" && days !== null && days <= (settings?.expiring_soon_days ?? 5);
+  const open =
+    payments.data?.filter((p) => p.status === "pending" || p.status === "clarification") ?? [];
+  const totalMs =
+    s.starts_at && s.expires_at
+      ? new Date(s.expires_at).getTime() - new Date(s.starts_at).getTime()
+      : 0;
+  const pct =
+    totalMs > 0
+      ? Math.min(
+          100,
+          Math.max(0, ((Date.now() - new Date(s.starts_at!).getTime()) / totalMs) * 100),
+        )
+      : 0;
+  const soon =
+    s.status === "active" && days !== null && days <= (settings?.expiring_soon_days ?? 5);
 
   return (
     <div className="space-y-6 animate-rise">
@@ -50,7 +74,12 @@ function Dashboard() {
       {/* Notices */}
       {open.map((p) =>
         p.status === "clarification" ? (
-          <Notice key={p.id} tone="info" icon={MessageCircleQuestion} title="The gym needs more information about your payment">
+          <Notice
+            key={p.id}
+            tone="info"
+            icon={MessageCircleQuestion}
+            title="The gym needs more information about your payment"
+          >
             {p.review_note} —{" "}
             <Link to="/app/history" className="font-medium underline underline-offset-4">
               Reply
@@ -58,8 +87,8 @@ function Dashboard() {
           </Notice>
         ) : (
           <Notice key={p.id} tone="warning" icon={Clock} title="Renewal awaiting verification">
-            {naira(p.amount)} for {p.membership_plans?.name ?? "a plan"}, submitted {fmtDateTime(p.created_at)}. Your membership
-            won't change until staff approve it.
+            {naira(p.amount)} for {p.membership_plans?.name ?? "a plan"}, submitted{" "}
+            {fmtDateTime(p.created_at)}. Your membership won't change until staff approve it.
           </Notice>
         ),
       )}
@@ -78,7 +107,14 @@ function Dashboard() {
             s.status === "suspended" && "stripes-suspended",
           )}
         >
-          <p className={cn("eyebrow", (s.status === "active" || s.status === "scheduled") && "text-ink-muted")}>Your membership</p>
+          <p
+            className={cn(
+              "eyebrow",
+              (s.status === "active" || s.status === "scheduled") && "text-ink-muted",
+            )}
+          >
+            Your membership
+          </p>
           <div className="mt-3">
             <StatusBadge status={s.status} className="text-sm" />
           </div>
@@ -87,8 +123,8 @@ function Dashboard() {
             <>
               <h2 className="mt-4 text-2xl font-semibold">No active membership yet</h2>
               <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                Your account is ready. Choose a plan and submit your payment — the gym activates your membership once the
-                payment is verified.
+                Your account is ready. Choose a plan and submit your payment — the gym activates
+                your membership once the payment is verified.
               </p>
               <Button asChild className="mt-6" size="lg">
                 <Link to="/app/renew">
@@ -103,7 +139,9 @@ function Dashboard() {
               <h2 className="mt-4 text-3xl font-semibold">{s.plan_name}</h2>
               <div className="mt-6 grid grid-cols-2 gap-6 border-t border-ink-border pt-5">
                 <div>
-                  <p className="text-xs text-ink-muted">{s.status === "scheduled" ? "Starts" : "Started"}</p>
+                  <p className="text-xs text-ink-muted">
+                    {s.status === "scheduled" ? "Starts" : "Started"}
+                  </p>
                   <p className="mt-1 font-medium tabular">{fmtDate(s.starts_at)}</p>
                 </div>
                 <div>
@@ -114,7 +152,10 @@ function Dashboard() {
               {s.status === "active" && (
                 <div className="mt-6">
                   <div className="h-1.5 overflow-hidden rounded-full bg-ink-border">
-                    <div className={cn("h-full rounded-full", soon ? "bg-warning" : "bg-brand")} style={{ width: `${100 - pct}%` }} />
+                    <div
+                      className={cn("h-full rounded-full", soon ? "bg-warning" : "bg-brand")}
+                      style={{ width: `${100 - pct}%` }}
+                    />
                   </div>
                   <p className="mt-2 text-sm text-ink-foreground/80 tabular">
                     {days} day{days === 1 ? "" : "s"} remaining
@@ -145,11 +186,16 @@ function Dashboard() {
           {(s.status === "suspended" || s.status === "cancelled") && (
             <>
               <h2 className="mt-4 text-2xl font-semibold">
-                {s.status === "suspended" ? "Your membership is suspended" : "Your membership was cancelled"}
+                {s.status === "suspended"
+                  ? "Your membership is suspended"
+                  : "Your membership was cancelled"}
               </h2>
-              {s.access_reason && <p className="mt-2 text-sm text-muted-foreground">Reason: {s.access_reason}</p>}
+              {s.access_reason && (
+                <p className="mt-2 text-sm text-muted-foreground">Reason: {s.access_reason}</p>
+              )}
               <p className="mt-2 text-sm text-muted-foreground">
-                Gym entry isn't available. {settings?.support_contact || "Please contact the front desk."}
+                Gym entry isn't available.{" "}
+                {settings?.support_contact || "Please contact the front desk."}
               </p>
             </>
           )}
@@ -163,7 +209,8 @@ function Dashboard() {
           </div>
           <p className="mt-3 font-mono text-lg font-medium">{s.member_code}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Show this at the front desk. Staff check your live status — the code alone doesn't grant entry.
+            Show this at the front desk. Staff check your live status — the code alone doesn't grant
+            entry.
           </p>
         </section>
       </div>
@@ -180,9 +227,17 @@ function Dashboard() {
             <ul>
               {periods.data.slice(0, 4).map((p) => {
                 const now = Date.now();
-                const st = new Date(p.ends_at).getTime() <= now ? "expired" : new Date(p.starts_at).getTime() > now ? "scheduled" : "active";
+                const st =
+                  new Date(p.ends_at).getTime() <= now
+                    ? "expired"
+                    : new Date(p.starts_at).getTime() > now
+                      ? "scheduled"
+                      : "active";
                 return (
-                  <li key={p.id} className="flex items-center gap-3 border-b px-5 py-3.5 last:border-0">
+                  <li
+                    key={p.id}
+                    className="flex items-center gap-3 border-b px-5 py-3.5 last:border-0"
+                  >
                     <CalendarDays className="size-4 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{p.plan_name}</p>
@@ -196,7 +251,9 @@ function Dashboard() {
               })}
             </ul>
           ) : (
-            <p className="px-5 py-8 text-center text-sm text-muted-foreground">No membership periods yet.</p>
+            <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+              No membership periods yet.
+            </p>
           )}
         </section>
         <section className="panel">
@@ -209,7 +266,10 @@ function Dashboard() {
           {payments.data?.length ? (
             <ul>
               {payments.data.slice(0, 4).map((p) => (
-                <li key={p.id} className="flex items-center gap-3 border-b px-5 py-3.5 last:border-0">
+                <li
+                  key={p.id}
+                  className="flex items-center gap-3 border-b px-5 py-3.5 last:border-0"
+                >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium tabular">
                       {naira(p.amount)} · {p.membership_plans?.name}
@@ -221,7 +281,9 @@ function Dashboard() {
               ))}
             </ul>
           ) : (
-            <p className="px-5 py-8 text-center text-sm text-muted-foreground">No payments submitted yet.</p>
+            <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+              No payments submitted yet.
+            </p>
           )}
         </section>
       </div>

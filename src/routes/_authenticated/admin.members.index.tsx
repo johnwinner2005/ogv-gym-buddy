@@ -39,12 +39,20 @@ function Members() {
 
   return (
     <div className="animate-rise">
-      <PageHeader title="Members" description="Search the directory and open a profile to manage a membership." />
+      <PageHeader
+        title="Members"
+        description="Search the directory and open a profile to manage a membership."
+      />
       <div className="panel">
         <div className="flex flex-col gap-3 border-b p-4 lg:flex-row lg:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, email, phone or member ID" className="pl-9" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Name, email, phone or member ID"
+              className="pl-9"
+            />
           </div>
           <div className="-mx-1 flex gap-1 overflow-x-auto px-1">
             {FILTERS.map(([k, label]) => (
@@ -56,7 +64,9 @@ function Members() {
                 }}
                 className={cn(
                   "whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                  status === k ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
+                  status === k
+                    ? "border-foreground bg-foreground text-background"
+                    : "hover:bg-muted",
                 )}
               >
                 {label}
@@ -67,7 +77,13 @@ function Members() {
         {list.isError ? (
           <ErrorState error={list.error} onRetry={() => list.refetch()} />
         ) : (
-          <MemberTable rows={list.data} loading={list.isLoading} page={page} pageSize={20} onPage={setPage} />
+          <MemberTable
+            rows={list.data}
+            loading={list.isLoading}
+            page={page}
+            pageSize={20}
+            onPage={setPage}
+          />
         )}
       </div>
     </div>

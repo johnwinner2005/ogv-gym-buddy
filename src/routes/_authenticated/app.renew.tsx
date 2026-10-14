@@ -39,7 +39,12 @@ function Renew() {
   const { data: settings } = useQuery(settingsQuery);
   const { data: status } = useQuery(myStatusQuery);
   const [planId, setPlanId] = useState<string | null>(null);
-  const [form, setForm] = useState({ amount: "", reference: "", paidOn: new Date().toISOString().slice(0, 10), note: "" });
+  const [form, setForm] = useState({
+    amount: "",
+    reference: "",
+    paidOn: new Date().toISOString().slice(0, 10),
+    note: "",
+  });
   const [file, setFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -49,12 +54,14 @@ function Renew() {
     mutationFn: async () => {
       const parsed = schema.safeParse(form);
       const errs: Record<string, string> = {};
-      if (!parsed.success) parsed.error.issues.forEach((i) => (errs[i.path[0] as string] = i.message));
+      if (!parsed.success)
+        parsed.error.issues.forEach((i) => (errs[i.path[0] as string] = i.message));
       if (!plan) errs.plan = "Choose a plan";
       if (!file) errs.file = "Attach your receipt or transfer screenshot";
       else if (file.size > MAX) errs.file = "File must be 8 MB or smaller";
       else if (!TYPES.includes(file.type)) errs.file = "Use a JPG, PNG, WEBP, HEIC or PDF file";
-      if (parsed.success && new Date(parsed.data.paidOn) > new Date()) errs.paidOn = "Payment date can't be in the future";
+      if (parsed.success && new Date(parsed.data.paidOn) > new Date())
+        errs.paidOn = "Payment date can't be in the future";
       setErrors(errs);
       if (Object.keys(errs).length || !parsed.success) throw new Error("validation");
       await submitPaymentRequest({
@@ -80,18 +87,26 @@ function Renew() {
   if (plans.isError) return <ErrorState error={plans.error} onRetry={() => plans.refetch()} />;
 
   // Preview only; the server computes the real dates on approval.
-  const periods = status?.expires_at ? [{ starts_at: status.starts_at!, ends_at: status.expires_at }] : [];
+  const periods = status?.expires_at
+    ? [{ starts_at: status.starts_at!, ends_at: status.expires_at }]
+    : [];
   const start = plan ? nextPeriodStart(periods, settings?.renewal_rule ?? "from_expiry") : null;
-  const end = plan && start ? addDuration(start, plan.duration_unit, plan.duration_value, settings?.timezone) : null;
+  const end =
+    plan && start
+      ? addDuration(start, plan.duration_unit, plan.duration_value, settings?.timezone)
+      : null;
 
   return (
     <div className="animate-rise">
-      <PageHeader title="Renew membership" description="Choose a plan, pay using the instructions below, then submit your receipt." />
+      <PageHeader
+        title="Renew membership"
+        description="Choose a plan, pay using the instructions below, then submit your receipt."
+      />
 
       {status?.status === "suspended" && (
         <p className="mb-6 rounded-md border border-suspended/25 bg-suspended-soft px-4 py-3 text-sm text-suspended">
-          Your membership is suspended. A renewal can be reviewed, but entry stays blocked until an administrator lifts the
-          suspension.
+          Your membership is suspended. A renewal can be reviewed, but entry stays blocked until an
+          administrator lifts the suspension.
         </p>
       )}
 
@@ -126,8 +141,12 @@ function Renew() {
                 )}
                 <p className="font-medium">{p.name}</p>
                 <p className="mt-2 font-display text-2xl font-semibold tabular">{naira(p.price)}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{describeDuration(p.duration_unit, p.duration_value)}</p>
-                {p.description && <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>}
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {describeDuration(p.duration_unit, p.duration_value)}
+                </p>
+                {p.description && (
+                  <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
+                )}
               </button>
             ))}
           </div>
@@ -139,8 +158,9 @@ function Renew() {
         <FieldError>{errors.plan}</FieldError>
         {plan && end && (
           <p className="mt-3 text-sm text-muted-foreground">
-            If approved today, this plan would run until about <span className="font-medium text-foreground">{fmtLongDate(end)}</span>.
-            The gym confirms the final dates on approval.
+            If approved today, this plan would run until about{" "}
+            <span className="font-medium text-foreground">{fmtLongDate(end)}</span>. The gym
+            confirms the final dates on approval.
           </p>
         )}
       </section>
@@ -149,11 +169,13 @@ function Renew() {
         <section className="panel p-5">
           <p className="eyebrow mb-3">2 · Pay</p>
           <p className="whitespace-pre-line text-sm leading-relaxed">
-            {settings?.payment_instructions || "Payment instructions haven't been set yet. Please ask the front desk."}
+            {settings?.payment_instructions ||
+              "Payment instructions haven't been set yet. Please ask the front desk."}
           </p>
           {me?.profile?.member_code && (
             <p className="mt-4 rounded-md bg-muted px-3 py-2 text-sm">
-              Your member ID: <span className="font-mono font-medium">{me.profile.member_code}</span>
+              Your member ID:{" "}
+              <span className="font-mono font-medium">{me.profile.member_code}</span>
             </p>
           )}
         </section>
@@ -171,18 +193,37 @@ function Renew() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="amount">Amount paid (₦)</Label>
-                <Input id="amount" inputMode="decimal" className="mt-1.5 tabular" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
+                <Input
+                  id="amount"
+                  inputMode="decimal"
+                  className="mt-1.5 tabular"
+                  value={form.amount}
+                  onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                />
                 <FieldError>{errors.amount}</FieldError>
               </div>
               <div>
                 <Label htmlFor="paidOn">Payment date</Label>
-                <Input id="paidOn" type="date" className="mt-1.5" value={form.paidOn} onChange={(e) => setForm({ ...form, paidOn: e.target.value })} />
+                <Input
+                  id="paidOn"
+                  type="date"
+                  className="mt-1.5"
+                  value={form.paidOn}
+                  onChange={(e) => setForm({ ...form, paidOn: e.target.value })}
+                />
                 <FieldError>{errors.paidOn}</FieldError>
               </div>
             </div>
             <div>
-              <Label htmlFor="ref">Transfer reference <span className="text-muted-foreground">(if available)</span></Label>
-              <Input id="ref" className="mt-1.5" value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} />
+              <Label htmlFor="ref">
+                Transfer reference <span className="text-muted-foreground">(if available)</span>
+              </Label>
+              <Input
+                id="ref"
+                className="mt-1.5"
+                value={form.reference}
+                onChange={(e) => setForm({ ...form, reference: e.target.value })}
+              />
             </div>
             <div>
               <Label htmlFor="file">Receipt or transfer screenshot</Label>
@@ -191,7 +232,9 @@ function Renew() {
                 className="mt-1.5 flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-input px-4 py-4 text-sm hover:bg-muted"
               >
                 <Upload className="size-4 text-muted-foreground" />
-                <span className="truncate">{file ? file.name : "Choose a file (JPG, PNG, PDF · max 8 MB)"}</span>
+                <span className="truncate">
+                  {file ? file.name : "Choose a file (JPG, PNG, PDF · max 8 MB)"}
+                </span>
               </label>
               <input
                 id="file"
@@ -203,13 +246,21 @@ function Renew() {
               <FieldError>{errors.file}</FieldError>
             </div>
             <div>
-              <Label htmlFor="note">Note <span className="text-muted-foreground">(optional)</span></Label>
-              <Textarea id="note" rows={2} className="mt-1.5" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} />
+              <Label htmlFor="note">
+                Note <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Textarea
+                id="note"
+                rows={2}
+                className="mt-1.5"
+                value={form.note}
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
+              />
             </div>
             <div className="flex gap-2.5 rounded-md bg-muted px-3 py-2.5 text-xs text-muted-foreground">
               <Info className="mt-px size-4 shrink-0" />
-              Uploading a receipt doesn't activate your membership. Staff check the payment first — you'll be notified when it's
-              approved.
+              Uploading a receipt doesn't activate your membership. Staff check the payment first —
+              you'll be notified when it's approved.
             </div>
             <Button type="submit" size="lg" className="w-full" disabled={submit.isPending}>
               {submit.isPending && <Loader2 className="animate-spin" />}

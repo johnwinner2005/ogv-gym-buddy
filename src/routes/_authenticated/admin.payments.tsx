@@ -4,24 +4,51 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { ExternalLink, FileText, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { approvePayment, memberStatusQuery, paymentQueueQuery, plansQuery, receiptUrl, reviewPayment } from "@/lib/api";
+import {
+  approvePayment,
+  memberStatusQuery,
+  paymentQueueQuery,
+  plansQuery,
+  receiptUrl,
+  reviewPayment,
+} from "@/lib/api";
 import { describeDuration } from "@/lib/membership";
 import { errMessage, fmtDate, fmtDateTime, fmtLongDate, naira, relative } from "@/lib/format";
 import { EmptyState, ErrorState, PageHeader, StatusBadge } from "@/components/status";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/payments")({
-  validateSearch: z.object({ id: z.string().uuid().optional(), tab: z.enum(["open", "approved", "rejected", "all"]).optional() }),
+  validateSearch: z.object({
+    id: z.string().uuid().optional(),
+    tab: z.enum(["open", "approved", "rejected", "all"]).optional(),
+  }),
   head: () => ({ meta: [{ title: "Payment verification — OGV Gym staff" }] }),
   component: Payments,
 });
 
-type Row = Awaited<ReturnType<NonNullable<ReturnType<typeof paymentQueueQuery>["queryFn"]>>>[number];
+type Row = Awaited<
+  ReturnType<NonNullable<ReturnType<typeof paymentQueueQuery>["queryFn"]>>
+>[number];
 
 function Payments() {
   const { id, tab = "open" } = Route.useSearch();
@@ -31,7 +58,10 @@ function Payments() {
 
   return (
     <div className="animate-rise">
-      <PageHeader title="Payment verification" description="Check each payment against the bank or payment provider before approving." />
+      <PageHeader
+        title="Payment verification"
+        description="Check each payment against the bank or payment provider before approving."
+      />
       <div className="mb-4 flex gap-1">
         {(["open", "approved", "rejected", "all"] as const).map((t) => (
           <button
@@ -62,10 +92,15 @@ function Payments() {
                 <li key={r.id}>
                   <button
                     onClick={() => navigate({ search: { tab, id: r.id } })}
-                    className={cn("flex w-full items-center gap-3 border-b px-5 py-3.5 text-left last:border-0 hover:bg-muted/60", r.id === id && "bg-muted")}
+                    className={cn(
+                      "flex w-full items-center gap-3 border-b px-5 py-3.5 text-left last:border-0 hover:bg-muted/60",
+                      r.id === id && "bg-muted",
+                    )}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{r.member?.full_name ?? "Unknown member"}</p>
+                      <p className="truncate text-sm font-medium">
+                        {r.member?.full_name ?? "Unknown member"}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {r.membership_plans?.name} · {relative(r.created_at)}
                       </p>
@@ -103,7 +138,10 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
   const { data: current } = useQuery(memberStatusQuery(row.member_id));
 
   useEffect(() => {
-    if (row.receipt_path) receiptUrl(row.receipt_path).then(setUrl).catch((e) => setUrlErr(errMessage(e)));
+    if (row.receipt_path)
+      receiptUrl(row.receipt_path)
+        .then(setUrl)
+        .catch((e) => setUrlErr(errMessage(e)));
   }, [row.receipt_path]);
 
   const done = (msg: string) => {
@@ -140,7 +178,11 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={row.status} />
-          <button onClick={onClose} className="grid size-8 place-items-center rounded-md hover:bg-muted" aria-label="Close">
+          <button
+            onClick={onClose}
+            className="grid size-8 place-items-center rounded-md hover:bg-muted"
+            aria-label="Close"
+          >
             <X className="size-4" />
           </button>
         </div>
@@ -199,15 +241,26 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
         ) : !url ? (
           <Loader2 className="size-4 animate-spin text-muted-foreground" />
         ) : isPdf ? (
-          <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-medium underline underline-offset-4">
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-medium underline underline-offset-4"
+          >
             <FileText className="size-4" /> Open PDF receipt <ExternalLink className="size-3" />
           </a>
         ) : (
           <a href={url} target="_blank" rel="noreferrer">
-            <img src={url} alt="Payment receipt" className="max-h-96 w-full rounded-md border bg-muted object-contain" />
+            <img
+              src={url}
+              alt="Payment receipt"
+              className="max-h-96 w-full rounded-md border bg-muted object-contain"
+            />
           </a>
         )}
-        <p className="mt-2 text-xs text-muted-foreground">A receipt is not proof of payment. Confirm the credit in the receiving account.</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          A receipt is not proof of payment. Confirm the credit in the receiving account.
+        </p>
       </div>
 
       {open && (
@@ -221,29 +274,51 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
               <SelectContent>
                 {plans.data?.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
-                    {p.name} · {naira(p.price)} · {describeDuration(p.duration_unit, p.duration_value)}
+                    {p.name} · {naira(p.price)} ·{" "}
+                    {describeDuration(p.duration_unit, p.duration_value)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {plan && Number(plan.price) !== Number(row.amount) && (
               <p className="mt-1.5 text-xs text-warning-foreground">
-                Amount claimed ({naira(row.amount)}) differs from the plan price ({naira(plan.price)}).
+                Amount claimed ({naira(row.amount)}) differs from the plan price (
+                {naira(plan.price)}).
               </p>
             )}
           </div>
-          <Button className="w-full" size="lg" variant="brand" onClick={() => setConfirm(true)} disabled={approve.isPending || review.isPending}>
+          <Button
+            className="w-full"
+            size="lg"
+            variant="brand"
+            onClick={() => setConfirm(true)}
+            disabled={approve.isPending || review.isPending}
+          >
             Approve payment
           </Button>
           <div>
             <Label>Reason or question for the member</Label>
-            <Textarea className="mt-1.5" rows={2} value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
+            <Textarea
+              className="mt-1.5"
+              rows={2}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              maxLength={500}
+            />
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" disabled={note.trim().length < 3 || review.isPending} onClick={() => review.mutate("clarification")}>
+            <Button
+              variant="outline"
+              disabled={note.trim().length < 3 || review.isPending}
+              onClick={() => review.mutate("clarification")}
+            >
               Ask for clarification
             </Button>
-            <Button variant="destructive" disabled={note.trim().length < 3 || review.isPending} onClick={() => review.mutate("rejected")}>
+            <Button
+              variant="destructive"
+              disabled={note.trim().length < 3 || review.isPending}
+              onClick={() => review.mutate("rejected")}
+            >
               Reject
             </Button>
           </div>
@@ -252,7 +327,11 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
       {!open && (
         <div className="border-t px-5 py-4 text-sm text-muted-foreground">
           {row.status === "approved" ? "Approved" : "Rejected"} {fmtDateTime(row.reviewed_at)}.{" "}
-          <Link to="/admin/members/$id" params={{ id: row.member_id }} className="font-medium text-foreground underline underline-offset-4">
+          <Link
+            to="/admin/members/$id"
+            params={{ id: row.member_id }}
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             Open member
           </Link>
         </div>
@@ -263,8 +342,12 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Approve and update membership?</AlertDialogTitle>
             <AlertDialogDescription>
-              You confirm that {naira(row.amount)} was received. {row.member?.full_name}'s membership will be activated or extended by{" "}
-              {plan ? describeDuration(plan.duration_unit, plan.duration_value) : "the selected plan"}. This can only happen once.
+              You confirm that {naira(row.amount)} was received. {row.member?.full_name}'s
+              membership will be activated or extended by{" "}
+              {plan
+                ? describeDuration(plan.duration_unit, plan.duration_value)
+                : "the selected plan"}
+              . This can only happen once.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

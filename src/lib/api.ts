@@ -24,7 +24,8 @@ export interface StatusResult {
   pending_requests: number;
   checked_at: string;
 }
-export type Decision = "granted" | "expired" | "suspended" | "cancelled" | "no_membership" | "not_found";
+export type Decision =
+  "granted" | "expired" | "suspended" | "cancelled" | "no_membership" | "not_found";
 export interface VerifyResult extends StatusResult {
   decision: Decision;
   last_verified: string | null;
@@ -79,7 +80,8 @@ export const meQuery = queryOptions({
 
 export const settingsQuery = queryOptions({
   queryKey: ["settings"],
-  queryFn: async () => unwrap<Settings>(await supabase.from("gym_settings").select("*").eq("id", 1).single()),
+  queryFn: async () =>
+    unwrap<Settings>(await supabase.from("gym_settings").select("*").eq("id", 1).single()),
   staleTime: 5 * 60_000,
 });
 
@@ -156,7 +158,16 @@ export const notificationsQuery = (userId: string) =>
   queryOptions({
     queryKey: ["notifications", userId],
     queryFn: async () =>
-      unwrap<{ id: string; kind: string; title: string; body: string; read_at: string | null; created_at: string }[]>(
+      unwrap<
+        {
+          id: string;
+          kind: string;
+          title: string;
+          body: string;
+          read_at: string | null;
+          created_at: string;
+        }[]
+      >(
         await supabase
           .from("notifications")
           .select("id, kind, title, body, read_at, created_at")
@@ -169,7 +180,12 @@ export const notificationsQuery = (userId: string) =>
 
 export async function markNotificationsRead(ids: string[]) {
   if (!ids.length) return;
-  unwrap(await supabase.from("notifications").update({ read_at: new Date().toISOString() }).in("id", ids));
+  unwrap(
+    await supabase
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", ids),
+  );
 }
 
 export async function syncMyNotices() {
@@ -226,7 +242,14 @@ export async function receiptUrl(path: string) {
 
 export async function searchMembers(q: string) {
   return unwrap<
-    { id: string; member_code: string; full_name: string; email: string; phone: string; photo_url: string | null }[]
+    {
+      id: string;
+      member_code: string;
+      full_name: string;
+      email: string;
+      phone: string;
+      photo_url: string | null;
+    }[]
   >(await supabase.rpc("search_members", { _q: q, _limit: 8 }));
 }
 
@@ -307,7 +330,10 @@ export const paymentQueueQuery = (status: string) =>
       const ids = [...new Set(rows.map((r) => r.member_id))];
       const profiles = ids.length
         ? unwrap<{ id: string; full_name: string; member_code: string; email: string }[]>(
-            await supabase.from("profiles").select("id, full_name, member_code, email").in("id", ids),
+            await supabase
+              .from("profiles")
+              .select("id, full_name, member_code, email")
+              .in("id", ids),
           )
         : [];
       const map = new Map(profiles.map((p) => [p.id, p]));
@@ -320,7 +346,11 @@ export async function approvePayment(id: string, planId: string) {
     await supabase.rpc("approve_payment", { _request: id, _plan: planId }),
   );
 }
-export async function reviewPayment(id: string, decision: "rejected" | "clarification", note: string) {
+export async function reviewPayment(
+  id: string,
+  decision: "rejected" | "clarification",
+  note: string,
+) {
   unwrap(await supabase.rpc("review_payment", { _request: id, _decision: decision, _note: note }));
 }
 
@@ -329,7 +359,13 @@ export async function previewPeriod(memberId: string, unit: DurationUnit, value:
     await supabase.rpc("preview_period", { _member: memberId, _unit: unit, _value: value }),
   );
 }
-export async function grantPeriod(memberId: string, planId: string | null, unit: DurationUnit, value: number, reason: string) {
+export async function grantPeriod(
+  memberId: string,
+  planId: string | null,
+  unit: DurationUnit,
+  value: number,
+  reason: string,
+) {
   return unwrap<{ starts_at: string; ends_at: string }>(
     await supabase.rpc("admin_grant_period", {
       _member: memberId,
@@ -340,8 +376,18 @@ export async function grantPeriod(memberId: string, planId: string | null, unit:
     }),
   );
 }
-export async function setAccessState(memberId: string, state: "normal" | "suspended" | "cancelled", reason: string) {
-  unwrap(await supabase.rpc("admin_set_access_state", { _member: memberId, _state: state, _reason: reason }));
+export async function setAccessState(
+  memberId: string,
+  state: "normal" | "suspended" | "cancelled",
+  reason: string,
+) {
+  unwrap(
+    await supabase.rpc("admin_set_access_state", {
+      _member: memberId,
+      _state: state,
+      _reason: reason,
+    }),
+  );
 }
 export async function setRole(userId: string, role: "admin" | "reception", grant: boolean) {
   unwrap(await supabase.rpc("admin_set_role", { _user: userId, _role: role, _grant: grant }));
@@ -363,7 +409,12 @@ export async function savePlan(p: Partial<Plan> & { id?: string }) {
 }
 
 export async function saveSettings(s: Partial<Settings>) {
-  unwrap(await supabase.from("gym_settings").update({ ...s, updated_at: new Date().toISOString() }).eq("id", 1));
+  unwrap(
+    await supabase
+      .from("gym_settings")
+      .update({ ...s, updated_at: new Date().toISOString() })
+      .eq("id", 1),
+  );
 }
 
 export const auditQuery = (memberId: string | null, page: number) =>
@@ -378,26 +429,46 @@ export const auditQuery = (memberId: string | null, page: number) =>
       if (memberId) q = q.eq("member_id", memberId);
       const res = await q;
       if (res.error) throw new Error(res.error.message);
-      const ids = [...new Set(res.data.flatMap((r) => [r.actor_id, r.member_id]).filter(Boolean) as string[])];
+      const ids = [
+        ...new Set(res.data.flatMap((r) => [r.actor_id, r.member_id]).filter(Boolean) as string[]),
+      ];
       const profiles = ids.length
-        ? ((await supabase.from("profiles").select("id, full_name, member_code").in("id", ids)).data ?? [])
+        ? ((await supabase.from("profiles").select("id, full_name, member_code").in("id", ids))
+            .data ?? [])
         : [];
-      return { rows: res.data, count: res.count ?? 0, people: new Map(profiles.map((p) => [p.id, p])) };
+      return {
+        rows: res.data,
+        count: res.count ?? 0,
+        people: new Map(profiles.map((p) => [p.id, p])),
+      };
     },
   });
 
 export const verificationLogQuery = queryOptions({
   queryKey: ["admin", "verifications"],
   queryFn: async () => {
-    const res = unwrap<{ id: string; member_id: string | null; result: string; staff_id: string; created_at: string }[]>(
-      await supabase.from("verification_logs").select("*").order("created_at", { ascending: false }).limit(15),
+    const res = unwrap<
+      {
+        id: string;
+        member_id: string | null;
+        result: string;
+        staff_id: string;
+        created_at: string;
+      }[]
+    >(
+      await supabase
+        .from("verification_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(15),
     );
     const ids = [...new Set(res.map((r) => r.member_id).filter(Boolean) as string[])];
     const profiles = ids.length
-      ? ((await supabase.from("profiles").select("id, full_name, member_code").in("id", ids)).data ?? [])
+      ? ((await supabase.from("profiles").select("id, full_name, member_code").in("id", ids))
+          .data ?? [])
       : [];
     const map = new Map(profiles.map((p) => [p.id, p]));
-    return res.map((r) => ({ ...r, member: r.member_id ? map.get(r.member_id) ?? null : null }));
+    return res.map((r) => ({ ...r, member: r.member_id ? (map.get(r.member_id) ?? null) : null }));
   },
 });
 
@@ -427,7 +498,10 @@ export const staffQuery = queryOptions({
           await supabase.from("profiles").select("id, full_name, email, member_code").in("id", ids),
         )
       : [];
-    return profiles.map((p) => ({ ...p, roles: roles.filter((r) => r.user_id === p.id).map((r) => r.role) }));
+    return profiles.map((p) => ({
+      ...p,
+      roles: roles.filter((r) => r.user_id === p.id).map((r) => r.role),
+    }));
   },
 });
 
@@ -435,5 +509,6 @@ export const staffQuery = queryOptions({
 export const memberStatusQuery = (id: string) =>
   queryOptions({
     queryKey: ["admin", "member-status", id],
-    queryFn: async () => unwrap<StatusResult>(await supabase.rpc("staff_member_status", { _member: id })),
+    queryFn: async () =>
+      unwrap<StatusResult>(await supabase.rpc("staff_member_status", { _member: id })),
   });

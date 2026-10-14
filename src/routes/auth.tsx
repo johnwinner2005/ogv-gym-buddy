@@ -91,7 +91,10 @@ function SignIn() {
         <div>
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
               Forgot password?
             </Link>
           </div>
@@ -107,7 +110,10 @@ function SignIn() {
           <FieldError>{errors.password}</FieldError>
         </div>
         {formError && (
-          <p role="alert" className="rounded-md border border-danger/20 bg-danger-soft px-3 py-2 text-sm text-danger">
+          <p
+            role="alert"
+            className="rounded-md border border-danger/20 bg-danger-soft px-3 py-2 text-sm text-danger"
+          >
             {formError}
           </p>
         )}

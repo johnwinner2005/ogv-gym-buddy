@@ -76,7 +76,9 @@ function Verify() {
   return (
     <div className="mx-auto max-w-3xl animate-rise">
       <h1 className="text-2xl font-semibold sm:text-[28px]">Verify membership</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Search by member ID, name, email or phone — or scan the member's pass.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Search by member ID, name, email or phone — or scan the member's pass.
+      </p>
 
       <form
         className="mt-5 flex gap-2"
@@ -98,15 +100,30 @@ function Verify() {
             aria-label="Search member"
           />
           {q && (
-            <button type="button" onClick={reset} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-label="Clear">
+            <button
+              type="button"
+              onClick={reset}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              aria-label="Clear"
+            >
               <X className="size-4" />
             </button>
           )}
         </div>
-        <Button type="submit" className="h-14 px-6" disabled={q.trim().length < 2 || state.kind === "loading"}>
+        <Button
+          type="submit"
+          className="h-14 px-6"
+          disabled={q.trim().length < 2 || state.kind === "loading"}
+        >
           {state.kind === "loading" ? <Loader2 className="animate-spin" /> : "Check"}
         </Button>
-        <Button type="button" variant="outline" className="h-14 w-14 p-0" onClick={() => setScanning(true)} aria-label="Scan QR code">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-14 w-14 p-0"
+          onClick={() => setScanning(true)}
+          aria-label="Scan QR code"
+        >
           <Camera className="size-5" />
         </Button>
       </form>
@@ -126,11 +143,16 @@ function Verify() {
         )}
         {state.kind === "matches" && (
           <div className="panel">
-            <p className="border-b px-5 py-3 text-sm text-muted-foreground">{state.items.length} members match — choose one</p>
+            <p className="border-b px-5 py-3 text-sm text-muted-foreground">
+              {state.items.length} members match — choose one
+            </p>
             <ul>
               {state.items.map((m) => (
                 <li key={m.id}>
-                  <button onClick={() => check(m.id)} className="flex w-full items-center gap-3 border-b px-5 py-3.5 text-left last:border-0 hover:bg-muted/60">
+                  <button
+                    onClick={() => check(m.id)}
+                    className="flex w-full items-center gap-3 border-b px-5 py-3.5 text-left last:border-0 hover:bg-muted/60"
+                  >
                     <Avatar name={m.full_name} url={m.photo_url} />
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">{m.full_name}</p>
@@ -146,7 +168,15 @@ function Verify() {
         )}
         {state.kind === "not_found" && <DecisionBanner decision="not_found" onReset={reset} />}
         {state.kind === "error" && (
-          <DecisionBanner decision="error" onReset={reset} extra={<Button variant="outline" onClick={state.retry}>Retry</Button>} />
+          <DecisionBanner
+            decision="error"
+            onReset={reset}
+            extra={
+              <Button variant="outline" onClick={state.retry}>
+                Retry
+              </Button>
+            }
+          />
         )}
         {state.kind === "result" && <Result data={state.data} onReset={reset} />}
       </div>
@@ -159,7 +189,14 @@ function Avatar({ name, url, large }: { name: string; url?: string | null; large
   return url ? (
     <img src={url} alt="" className={cn("rounded-full object-cover", size)} />
   ) : (
-    <div className={cn("grid shrink-0 place-items-center rounded-full bg-secondary font-semibold", size)}>{initials(name)}</div>
+    <div
+      className={cn(
+        "grid shrink-0 place-items-center rounded-full bg-secondary font-semibold",
+        size,
+      )}
+    >
+      {initials(name)}
+    </div>
   );
 }
 
@@ -175,17 +212,27 @@ function DecisionBanner({
   const d = DECISION[decision];
   const Icon = d.icon;
   return (
-    <div role="alert" aria-live="assertive" className={cn("rounded-xl px-6 py-7 animate-rise", d.surface)}>
+    <div
+      role="alert"
+      aria-live="assertive"
+      className={cn("rounded-xl px-6 py-7 animate-rise", d.surface)}
+    >
       <div className="flex items-start gap-4">
         <Icon className="size-10 shrink-0" aria-hidden />
         <div className="flex-1">
-          <p className="font-display text-3xl font-bold uppercase tracking-tight sm:text-4xl">{d.title}</p>
+          <p className="font-display text-3xl font-bold uppercase tracking-tight sm:text-4xl">
+            {d.title}
+          </p>
           <p className="mt-1.5 text-sm opacity-90">{d.detail}</p>
         </div>
       </div>
       <div className="mt-5 flex flex-wrap gap-2">
         {extra}
-        <Button variant="outline" onClick={onReset} className="border-current/30 bg-transparent text-current hover:bg-background/15 hover:text-current">
+        <Button
+          variant="outline"
+          onClick={onReset}
+          className="border-current/30 bg-transparent text-current hover:bg-background/15 hover:text-current"
+        >
           <RotateCcw /> Next member
         </Button>
       </div>
@@ -212,8 +259,12 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
             <dd className="mt-0.5 font-medium">{data.plan_name ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">{data.status === "expired" ? "Expired on" : "Expires"}</dt>
-            <dd className="mt-0.5 font-medium tabular">{data.expires_at ? fmtLongDate(data.expires_at) : "—"}</dd>
+            <dt className="text-xs text-muted-foreground">
+              {data.status === "expired" ? "Expired on" : "Expires"}
+            </dt>
+            <dd className="mt-0.5 font-medium tabular">
+              {data.expires_at ? fmtLongDate(data.expires_at) : "—"}
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Phone</dt>
@@ -221,13 +272,17 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Last checked</dt>
-            <dd className="mt-0.5 font-medium">{data.last_verified ? relative(data.last_verified) : "First check"}</dd>
+            <dd className="mt-0.5 font-medium">
+              {data.last_verified ? relative(data.last_verified) : "First check"}
+            </dd>
           </div>
         </dl>
         {(data.access_reason || data.pending_requests > 0) && (
           <div className="mt-4 space-y-2">
             {data.access_reason && (
-              <p className="rounded-md bg-suspended-soft px-3 py-2 text-sm text-suspended">Reason: {data.access_reason}</p>
+              <p className="rounded-md bg-suspended-soft px-3 py-2 text-sm text-suspended">
+                Reason: {data.access_reason}
+              </p>
             )}
             {data.pending_requests > 0 && (
               <p className="rounded-md bg-warning-soft px-3 py-2 text-sm text-warning-foreground">
@@ -238,7 +293,11 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
         )}
         <div className="mt-5 flex items-center justify-between border-t pt-4 text-xs text-muted-foreground">
           <span>Checked {fmtDateTime(data.checked_at)} · recorded</span>
-          <Link to="/admin/members/$id" params={{ id: data.member_id }} className="font-medium text-foreground underline underline-offset-4">
+          <Link
+            to="/admin/members/$id"
+            params={{ id: data.member_id }}
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             Open profile
           </Link>
         </div>

@@ -36,7 +36,10 @@ function Forgot() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) return setError(error.status === 429 ? "Too many requests. Try again shortly." : error.message);
+    if (error)
+      return setError(
+        error.status === 429 ? "Too many requests. Try again shortly." : error.message,
+      );
     setSent(true);
   }
 
@@ -58,7 +61,13 @@ function Forgot() {
         <form onSubmit={submit} className="space-y-4" noValidate>
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" className="mt-1.5 h-11" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              id="email"
+              type="email"
+              className="mt-1.5 h-11"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <FieldError>{error}</FieldError>
           </div>
           <Button type="submit" size="lg" className="w-full" disabled={loading}>

@@ -33,7 +33,9 @@ function NavList({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => v
           <it.icon className="size-[18px]" aria-hidden />
           <span className="flex-1">{it.label}</span>
           {!!it.badge && (
-            <span className="rounded-full bg-warning px-1.5 py-px text-[11px] font-semibold text-ink tabular">{it.badge}</span>
+            <span className="rounded-full bg-warning px-1.5 py-px text-[11px] font-semibold text-ink tabular">
+              {it.badge}
+            </span>
           )}
         </Link>
       ))}
@@ -66,18 +68,30 @@ function Notifications({ userId }: { userId: string }) {
       }}
     >
       <PopoverTrigger asChild>
-        <button className="relative grid size-10 place-items-center rounded-md hover:bg-accent" aria-label={`Notifications${unread.length ? `, ${unread.length} unread` : ""}`}>
+        <button
+          className="relative grid size-10 place-items-center rounded-md hover:bg-accent"
+          aria-label={`Notifications${unread.length ? `, ${unread.length} unread` : ""}`}
+        >
           <Bell className="size-[18px]" />
-          {unread.length > 0 && <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-danger" />}
+          {unread.length > 0 && (
+            <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-danger" />
+          )}
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[min(92vw,360px)] p-0">
         <div className="border-b px-4 py-3 text-sm font-medium">Notifications</div>
         <div className="max-h-96 overflow-y-auto">
-          {data.length === 0 && <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nothing yet.</p>}
+          {data.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nothing yet.</p>
+          )}
           {data.map((n) => (
             <div key={n.id} className="flex gap-3 border-b px-4 py-3 last:border-0">
-              <span className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", n.read_at ? "bg-transparent" : "bg-brand")} />
+              <span
+                className={cn(
+                  "mt-1.5 size-1.5 shrink-0 rounded-full",
+                  n.read_at ? "bg-transparent" : "bg-brand",
+                )}
+              />
               <div className="min-w-0">
                 <p className="text-sm font-medium">{n.title}</p>
                 {n.body && <p className="mt-0.5 text-sm text-muted-foreground">{n.body}</p>}
@@ -137,7 +151,11 @@ export function AppShell({
       </Sheet>
       <div className="min-w-0">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
-          <button className="grid size-10 place-items-center rounded-md hover:bg-accent lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
+          <button
+            className="grid size-10 place-items-center rounded-md hover:bg-accent lg:hidden"
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+          >
             <Menu className="size-5" />
           </button>
           <div className="lg:hidden">
@@ -164,7 +182,9 @@ export function AppShell({
             </Button>
           )}
           <div className="ml-1 hidden items-center gap-2.5 sm:flex">
-            <div className="grid size-9 place-items-center rounded-full bg-secondary text-xs font-semibold">{initials(name)}</div>
+            <div className="grid size-9 place-items-center rounded-full bg-secondary text-xs font-semibold">
+              {initials(name)}
+            </div>
             <div className="hidden leading-tight md:block">
               <p className="text-sm font-medium">{name}</p>
               <p className="text-xs text-muted-foreground font-mono">{me?.profile?.member_code}</p>

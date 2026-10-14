@@ -8,9 +8,15 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "OGV Gym — Members" },
-      { name: "description", content: "Check your OGV Gym membership, expiry date and renew online." },
+      {
+        name: "description",
+        content: "Check your OGV Gym membership, expiry date and renew online.",
+      },
       { property: "og:title", content: "OGV Gym — Members" },
-      { property: "og:description", content: "Check your OGV Gym membership, expiry date and renew online." },
+      {
+        property: "og:description",
+        content: "Check your OGV Gym membership, expiry date and renew online.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -35,7 +41,11 @@ function Index() {
 
       <main className="mx-auto max-w-6xl px-6 pb-16">
         <section className="relative overflow-hidden rounded-xl ink-surface">
-          <img src={gym} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+          <img
+            src={gym}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover opacity-40"
+          />
           <div className="relative grid gap-10 px-6 py-14 sm:px-12 sm:py-20 lg:grid-cols-[1.4fr_1fr]">
             <div>
               <p className="eyebrow text-ink-muted">OGV Gym · Members</p>
@@ -45,8 +55,8 @@ function Index() {
                 always up to date.
               </h1>
               <p className="mt-5 max-w-md text-ink-foreground/75">
-                See your plan and expiry date, renew by uploading your transfer receipt, and show your pass at the
-                front desk.
+                See your plan and expiry date, renew by uploading your transfer receipt, and show
+                your pass at the front desk.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg" variant="ink">
@@ -54,7 +64,12 @@ function Index() {
                     Create account <ArrowRight />
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-ink-border bg-transparent text-ink-foreground hover:bg-ink-foreground/10 hover:text-ink-foreground">
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="border-ink-border bg-transparent text-ink-foreground hover:bg-ink-foreground/10 hover:text-ink-foreground"
+                >
                   <Link to="/auth">I already have an account</Link>
                 </Button>
               </div>
@@ -64,9 +79,21 @@ function Index() {
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           {[
-            { icon: ShieldCheck, t: "Verified at the desk", d: "Staff check your live membership status — no paper cards." },
-            { icon: ReceiptText, t: "Renew in minutes", d: "Pick a plan, pay by transfer, upload the receipt for review." },
-            { icon: QrCode, t: "Your pass on your phone", d: "A personal QR code that staff scan at entry." },
+            {
+              icon: ShieldCheck,
+              t: "Verified at the desk",
+              d: "Staff check your live membership status — no paper cards.",
+            },
+            {
+              icon: ReceiptText,
+              t: "Renew in minutes",
+              d: "Pick a plan, pay by transfer, upload the receipt for review.",
+            },
+            {
+              icon: QrCode,
+              t: "Your pass on your phone",
+              d: "A personal QR code that staff scan at entry.",
+            },
           ].map(({ icon: Icon, t, d }) => (
             <div key={t} className="panel p-5">
               <Icon className="size-5 text-brand" />

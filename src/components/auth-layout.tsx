@@ -3,7 +3,17 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/status";
 import gym from "@/assets/gym-floor.jpg";
 
-export function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode }) {
+export function AuthLayout({
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  footer?: ReactNode;
+}) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1fr_1.05fr]">
       <div className="flex flex-col px-6 py-8 sm:px-12">
@@ -28,7 +38,8 @@ export function AuthLayout({ title, subtitle, children, footer }: { title: strin
             We'll keep track.
           </p>
           <p className="mt-3 max-w-sm text-sm text-ink-foreground/75">
-            Your membership, expiry date and renewals in one place — verified at the front desk in seconds.
+            Your membership, expiry date and renewals in one place — verified at the front desk in
+            seconds.
           </p>
         </div>
       </div>

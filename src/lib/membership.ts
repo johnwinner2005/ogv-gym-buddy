@@ -8,12 +8,7 @@
 export type DurationUnit = "days" | "months";
 export type AccessState = "normal" | "suspended" | "cancelled";
 export type MembershipStatus =
-  | "active"
-  | "expired"
-  | "suspended"
-  | "cancelled"
-  | "none"
-  | "scheduled";
+  "active" | "expired" | "suspended" | "cancelled" | "none" | "scheduled";
 export type RenewalRule = "from_expiry" | "from_approval";
 
 export interface Period {
@@ -36,7 +31,14 @@ function tzOffset(d: Date, tz: string): number {
     second: "2-digit",
   }).formatToParts(d);
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
-  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  const asUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour"),
+    get("minute"),
+    get("second"),
+  );
   return asUtc - Math.floor(d.getTime() / 1000) * 1000;
 }
 
@@ -45,8 +47,14 @@ function tzOffset(d: Date, tz: string): number {
  * calendar-month step in the gym's timezone, clamped to the last day of the
  * month (31 Jan + 1 month = 28/29 Feb), matching PostgreSQL interval rules.
  */
-export function addDuration(start: Date, unit: DurationUnit, value: number, tz = "Africa/Lagos"): Date {
-  if (!Number.isInteger(value) || value <= 0) throw new Error("Duration must be a positive whole number");
+export function addDuration(
+  start: Date,
+  unit: DurationUnit,
+  value: number,
+  tz = "Africa/Lagos",
+): Date {
+  if (!Number.isInteger(value) || value <= 0)
+    throw new Error("Duration must be a positive whole number");
   if (unit === "days") return new Date(start.getTime() + value * 86_400_000);
   const off = tzOffset(start, tz);
   const local = new Date(start.getTime() + off);
@@ -70,12 +78,17 @@ export function addDuration(start: Date, unit: DurationUnit, value: number, tz =
 }
 
 /** Status derivation. Validity window is [starts_at, ends_at). */
-export function deriveStatus(periods: Period[], access: AccessState, now = new Date()): MembershipStatus {
+export function deriveStatus(
+  periods: Period[],
+  access: AccessState,
+  now = new Date(),
+): MembershipStatus {
   if (access === "suspended") return "suspended";
   if (access === "cancelled") return "cancelled";
   if (periods.length === 0) return "none";
   const t = now.getTime();
-  if (periods.some((p) => toDate(p.starts_at).getTime() <= t && toDate(p.ends_at).getTime() > t)) return "active";
+  if (periods.some((p) => toDate(p.starts_at).getTime() <= t && toDate(p.ends_at).getTime() > t))
+    return "active";
   const latest = latestEnd(periods)!;
   return latest.getTime() > t ? "scheduled" : "expired";
 }
@@ -96,7 +109,10 @@ export function canEnter(status: MembershipStatus | "not_found" | "error"): bool
   return status === "active";
 }
 
-export function daysRemaining(expiresAt: string | Date | null | undefined, now = new Date()): number | null {
+export function daysRemaining(
+  expiresAt: string | Date | null | undefined,
+  now = new Date(),
+): number | null {
   if (!expiresAt) return null;
   const ms = toDate(expiresAt).getTime() - now.getTime();
   if (ms <= 0) return 0;

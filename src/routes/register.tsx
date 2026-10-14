@@ -39,13 +39,20 @@ const schema = z
   .refine((v) => v.password === v.confirm, { path: ["confirm"], message: "Passwords don't match" });
 
 function Register() {
-  const [form, setForm] = useState({ full_name: "", email: "", phone: "", password: "", confirm: "" });
+  const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirm: "",
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm({ ...form, [k]: e.target.value });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,8 +99,8 @@ function Register() {
         <div className="panel flex gap-3 p-4 text-sm">
           <MailCheck className="mt-0.5 size-5 shrink-0 text-brand" />
           <p className="text-muted-foreground">
-            Open the link to confirm your account, then sign in. Your account isn't a gym membership yet — the front
-            desk activates your plan once payment is verified.
+            Open the link to confirm your account, then sign in. Your account isn't a gym membership
+            yet — the front desk activates your plan once payment is verified.
           </p>
         </div>
         <Button asChild variant="outline" className="mt-6 w-full">
@@ -142,7 +149,10 @@ function Register() {
           </div>
         ))}
         {formError && (
-          <p role="alert" className="rounded-md border border-danger/20 bg-danger-soft px-3 py-2 text-sm text-danger">
+          <p
+            role="alert"
+            className="rounded-md border border-danger/20 bg-danger-soft px-3 py-2 text-sm text-danger"
+          >
             {formError}
           </p>
         )}

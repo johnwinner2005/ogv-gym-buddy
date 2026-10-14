@@ -41,7 +41,10 @@ function Profile() {
     mutationFn: async () => {
       if (pw.next.length < 8 || !/[A-Za-z]/.test(pw.next) || !/[0-9]/.test(pw.next))
         throw new Error("Use at least 8 characters with a letter and a number");
-      const { error } = await supabase.auth.updateUser({ password: pw.next, current_password: pw.current } as never);
+      const { error } = await supabase.auth.updateUser({
+        password: pw.next,
+        current_password: pw.current,
+      } as never);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -67,7 +70,9 @@ function Profile() {
           </div>
         ))}
       </section>
-      <p className="mt-2 text-xs text-muted-foreground">To change your email address, please ask the front desk.</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        To change your email address, please ask the front desk.
+      </p>
 
       <form
         className="panel mt-6 space-y-4 p-5"
@@ -79,11 +84,24 @@ function Profile() {
         <h2 className="font-medium">Personal details</h2>
         <div>
           <Label htmlFor="name">Full name</Label>
-          <Input id="name" className="mt-1.5" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
+          <Input
+            id="name"
+            className="mt-1.5"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={120}
+          />
         </div>
         <div>
           <Label htmlFor="phone">Phone number</Label>
-          <Input id="phone" type="tel" className="mt-1.5" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} />
+          <Input
+            id="phone"
+            type="tel"
+            className="mt-1.5"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            maxLength={20}
+          />
         </div>
         <Button type="submit" disabled={save.isPending}>
           {save.isPending && <Loader2 className="animate-spin" />}
@@ -101,13 +119,31 @@ function Profile() {
         <h2 className="font-medium">Change password</h2>
         <div>
           <Label htmlFor="cur">Current password</Label>
-          <Input id="cur" type="password" autoComplete="current-password" className="mt-1.5" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
+          <Input
+            id="cur"
+            type="password"
+            autoComplete="current-password"
+            className="mt-1.5"
+            value={pw.current}
+            onChange={(e) => setPw({ ...pw, current: e.target.value })}
+          />
         </div>
         <div>
           <Label htmlFor="new">New password</Label>
-          <Input id="new" type="password" autoComplete="new-password" className="mt-1.5" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
+          <Input
+            id="new"
+            type="password"
+            autoComplete="new-password"
+            className="mt-1.5"
+            value={pw.next}
+            onChange={(e) => setPw({ ...pw, next: e.target.value })}
+          />
         </div>
-        <Button type="submit" variant="outline" disabled={changePw.isPending || !pw.current || !pw.next}>
+        <Button
+          type="submit"
+          variant="outline"
+          disabled={changePw.isPending || !pw.current || !pw.next}
+        >
           {changePw.isPending && <Loader2 className="animate-spin" />}
           Update password
         </Button>

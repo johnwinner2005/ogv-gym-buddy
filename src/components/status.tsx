@@ -107,7 +107,8 @@ export const DECISION: Record<
   },
   error: {
     title: "Unable to verify",
-    detail: "The membership could not be checked. Do not admit on this result. Retry, or check the connection.",
+    detail:
+      "The membership could not be checked. Do not admit on this result. Retry, or check the connection.",
     icon: WifiOff,
     surface: "bg-warning-soft text-warning-foreground border border-warning/40",
     allowed: false,
@@ -139,7 +140,9 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
     <div className="flex flex-col items-center px-6 py-10 text-center">
       <WifiOff className="mb-2 size-5 text-danger" aria-hidden />
       <p className="text-sm font-medium">Couldn't load this</p>
-      <p className="mt-1 text-sm text-muted-foreground">{(error as Error)?.message ?? "Unknown error"}</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {(error as Error)?.message ?? "Unknown error"}
+      </p>
       {onRetry && (
         <button onClick={onRetry} className="mt-3 text-sm font-medium underline underline-offset-4">
           Try again
@@ -214,7 +217,12 @@ export function Logo({ className, inverted }: { className?: string; inverted?: b
       </div>
       <div className="leading-none">
         <div className="font-display text-[15px] font-semibold">OGV Gym</div>
-        <div className={cn("mt-0.5 text-[10px] tracking-[0.18em] uppercase", inverted ? "text-ink-muted" : "text-muted-foreground")}>
+        <div
+          className={cn(
+            "mt-0.5 text-[10px] tracking-[0.18em] uppercase",
+            inverted ? "text-ink-muted" : "text-muted-foreground",
+          )}
+        >
           Membership
         </div>
       </div>

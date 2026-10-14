@@ -55,15 +55,34 @@ function Reset() {
   }
 
   return (
-    <AuthLayout title="Choose a new password" subtitle={ready ? undefined : "Open this page from the link in your reset email."}>
+    <AuthLayout
+      title="Choose a new password"
+      subtitle={ready ? undefined : "Open this page from the link in your reset email."}
+    >
       <form onSubmit={submit} className="space-y-4" noValidate>
         <div>
           <Label htmlFor="pw">New password</Label>
-          <Input id="pw" type="password" autoComplete="new-password" className="mt-1.5 h-11" value={pw} onChange={(e) => setPw(e.target.value)} disabled={!ready} />
+          <Input
+            id="pw"
+            type="password"
+            autoComplete="new-password"
+            className="mt-1.5 h-11"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            disabled={!ready}
+          />
         </div>
         <div>
           <Label htmlFor="pw2">Confirm password</Label>
-          <Input id="pw2" type="password" autoComplete="new-password" className="mt-1.5 h-11" value={confirm} onChange={(e) => setConfirm(e.target.value)} disabled={!ready} />
+          <Input
+            id="pw2"
+            type="password"
+            autoComplete="new-password"
+            className="mt-1.5 h-11"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            disabled={!ready}
+          />
           <FieldError>{error}</FieldError>
         </div>
         <Button type="submit" size="lg" className="w-full" disabled={loading || !ready}>

@@ -84,7 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "OGV Gym — Membership" },
       { name: "description", content: "OGV Gym membership portal and front-desk verification." },
       { property: "og:title", content: "OGV Gym — Membership" },
-      { property: "og:description", content: "OGV Gym membership portal and front-desk verification." },
+      {
+        property: "og:description",
+        content: "OGV Gym membership portal and front-desk verification.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

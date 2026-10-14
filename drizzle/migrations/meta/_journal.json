@@ -22,6 +22,20 @@
       "when": 1791972358134,
       "tag": "0002_staff_member_status",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791976111010,
+      "tag": "0003_add_super_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791976155610,
+      "tag": "0004_super_admin_checkins_fixes",
+      "breakpoints": true
     }
   ]
 }

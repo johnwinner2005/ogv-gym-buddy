@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/renew")({
-  head: () => ({ meta: [{ title: "Renew membership — OGV Gym" }] }),
+  head: () => ({ meta: [{ title: "Activate or renew membership — OGV Gym" }] }),
   component: Renew,
 });
 
@@ -49,6 +49,7 @@ function Renew() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const plan = plans.data?.find((p) => p.id === planId);
+  const firstTime = !status || status.status === "none";
 
   const submit = useMutation({
     mutationFn: async () => {
@@ -75,7 +76,7 @@ function Renew() {
       });
     },
     onSuccess: () => {
-      toast.success("Renewal submitted for verification");
+      toast.success(firstTime ? "Activation request submitted for verification" : "Renewal submitted for verification");
       qc.invalidateQueries();
       navigate({ to: "/app" });
     },
@@ -99,7 +100,7 @@ function Renew() {
   return (
     <div className="animate-rise">
       <PageHeader
-        title="Renew membership"
+        title={firstTime ? "Activate membership" : "Renew membership"}
         description="Choose a plan, pay using the instructions below, then submit your receipt."
       />
 
@@ -130,7 +131,7 @@ function Renew() {
                   setForm((f) => ({ ...f, amount: String(p.price) }));
                 }}
                 className={cn(
-                  "panel relative p-5 text-left transition-colors hover:border-foreground/30",
+                  "panel relative border p-5 text-left transition-all hover:-translate-y-0.5 hover:border-foreground/30",
                   planId === p.id && "border-foreground ring-1 ring-foreground",
                 )}
               >

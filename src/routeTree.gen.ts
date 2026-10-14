@@ -18,6 +18,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminCheckInsRouteImport } from './routes/_authenticated/admin.check-ins'
 import { Route as AuthenticatedAdminExpiryRouteImport } from './routes/_authenticated/admin.expiry'
 import { Route as AuthenticatedAdminLogsRouteImport } from './routes/_authenticated/admin.logs'
 import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authenticated/admin.members'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin.plans'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin.staff'
 import { Route as AuthenticatedAdminVerifyRouteImport } from './routes/_authenticated/admin.verify'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppHistoryRouteImport } from './routes/_authenticated/app.history'
@@ -77,6 +79,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminCheckInsRoute =
+  AuthenticatedAdminCheckInsRouteImport.update({
+    id: '/check-ins',
+    path: '/check-ins',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminExpiryRoute =
   AuthenticatedAdminExpiryRouteImport.update({
     id: '/expiry',
@@ -117,6 +125,11 @@ const AuthenticatedAdminSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminStaffRoute = AuthenticatedAdminStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminVerifyRoute =
   AuthenticatedAdminVerifyRouteImport.update({
     id: '/verify',
@@ -164,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/admin/check-ins': typeof AuthenticatedAdminCheckInsRoute
   '/admin/expiry': typeof AuthenticatedAdminExpiryRoute
   '/admin/logs': typeof AuthenticatedAdminLogsRoute
   '/admin/members': typeof AuthenticatedAdminMembersRouteWithChildren
@@ -171,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -186,12 +201,14 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/admin/check-ins': typeof AuthenticatedAdminCheckInsRoute
   '/admin/expiry': typeof AuthenticatedAdminExpiryRoute
   '/admin/logs': typeof AuthenticatedAdminLogsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -211,6 +228,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/admin/check-ins': typeof AuthenticatedAdminCheckInsRoute
   '/_authenticated/admin/expiry': typeof AuthenticatedAdminExpiryRoute
   '/_authenticated/admin/logs': typeof AuthenticatedAdminLogsRoute
   '/_authenticated/admin/members': typeof AuthenticatedAdminMembersRouteWithChildren
@@ -218,6 +236,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/_authenticated/app/history': typeof AuthenticatedAppHistoryRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
@@ -237,6 +256,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/admin'
     | '/app'
+    | '/admin/check-ins'
     | '/admin/expiry'
     | '/admin/logs'
     | '/admin/members'
@@ -244,6 +264,7 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/admin/reports'
     | '/admin/settings'
+    | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
     | '/app/profile'
@@ -259,12 +280,14 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/register'
     | '/reset-password'
+    | '/admin/check-ins'
     | '/admin/expiry'
     | '/admin/logs'
     | '/admin/payments'
     | '/admin/plans'
     | '/admin/reports'
     | '/admin/settings'
+    | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
     | '/app/profile'
@@ -283,6 +306,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/admin/check-ins'
     | '/_authenticated/admin/expiry'
     | '/_authenticated/admin/logs'
     | '/_authenticated/admin/members'
@@ -290,6 +314,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/plans'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/staff'
     | '/_authenticated/admin/verify'
     | '/_authenticated/app/history'
     | '/_authenticated/app/profile'
@@ -374,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/check-ins': {
+      id: '/_authenticated/admin/check-ins'
+      path: '/check-ins'
+      fullPath: '/admin/check-ins'
+      preLoaderRoute: typeof AuthenticatedAdminCheckInsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/expiry': {
       id: '/_authenticated/admin/expiry'
       path: '/expiry'
@@ -421,6 +453,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/staff': {
+      id: '/_authenticated/admin/staff'
+      path: '/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AuthenticatedAdminStaffRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/verify': {
@@ -492,6 +531,7 @@ const AuthenticatedAdminMembersRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCheckInsRoute: typeof AuthenticatedAdminCheckInsRoute
   AuthenticatedAdminExpiryRoute: typeof AuthenticatedAdminExpiryRoute
   AuthenticatedAdminLogsRoute: typeof AuthenticatedAdminLogsRoute
   AuthenticatedAdminMembersRoute: typeof AuthenticatedAdminMembersRouteWithChildren
@@ -499,11 +539,13 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPlansRoute: typeof AuthenticatedAdminPlansRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
   AuthenticatedAdminVerifyRoute: typeof AuthenticatedAdminVerifyRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCheckInsRoute: AuthenticatedAdminCheckInsRoute,
   AuthenticatedAdminExpiryRoute: AuthenticatedAdminExpiryRoute,
   AuthenticatedAdminLogsRoute: AuthenticatedAdminLogsRoute,
   AuthenticatedAdminMembersRoute: AuthenticatedAdminMembersRouteWithChildren,
@@ -511,6 +553,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminPlansRoute: AuthenticatedAdminPlansRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
   AuthenticatedAdminVerifyRoute: AuthenticatedAdminVerifyRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }

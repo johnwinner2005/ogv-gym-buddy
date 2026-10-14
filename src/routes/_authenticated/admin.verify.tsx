@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, RotateCcw, Search, X } from "lucide-react";
-import { searchMembers, verifyMember, type VerifyResult } from "@/lib/api";
-import { fmtDateTime, fmtLongDate, initials, relative } from "@/lib/format";
+import { Camera, DoorOpen, Loader2, RotateCcw, Search, X } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { admitMember, searchMembers, verifyMember, type VerifyResult } from "@/lib/api";
+import { errMessage, fmtDateTime, fmtLongDate, fmtTime, initials, relative } from "@/lib/format";
 import { DECISION, StatusBadge } from "@/components/status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -241,9 +243,41 @@ function DecisionBanner({
 }
 
 function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) {
+  const qc = useQueryClient();
+  const [admittedAt, setAdmittedAt] = useState<string | null>(null);
+  const admit = useMutation({
+    mutationFn: () => admitMember(data.member_id),
+    onSuccess: (r) => {
+      setAdmittedAt(r.created_at);
+      toast.success(`${data.full_name} checked in`);
+      qc.invalidateQueries({ queryKey: ["check-ins"] });
+    },
+    onError: (e) => toast.error(errMessage(e)),
+  });
   return (
     <div className="space-y-4">
-      <DecisionBanner decision={data.decision} onReset={onReset} />
+      <DecisionBanner
+        decision={data.decision}
+        onReset={onReset}
+        extra={
+          data.decision === "granted" ? (
+            admittedAt ? (
+              <span className="inline-flex h-9 animate-pop items-center gap-2 rounded-md bg-background/20 px-3 text-sm font-medium">
+                <DoorOpen className="size-4" /> Checked in at {fmtTime(admittedAt)}
+              </span>
+            ) : (
+              <Button
+                onClick={() => admit.mutate()}
+                disabled={admit.isPending}
+                className="bg-background text-foreground hover:bg-background/90"
+              >
+                {admit.isPending ? <Loader2 className="animate-spin" /> : <DoorOpen />}
+                Admit entry
+              </Button>
+            )
+          ) : undefined
+        }
+      />
       <div className="panel p-5">
         <div className="flex items-center gap-4">
           <Avatar name={data.full_name} url={data.photo_url} large />
@@ -308,42 +342,88 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
 
 function Scanner({ onResult, onClose }: { onResult: (t: string) => void; onClose: () => void }) {
   const [error, setError] = useState("");
+  const [starting, setStarting] = useState(true);
+  // Keep the latest callback without restarting the camera on every render.
+  const cb = useRef(onResult);
+  cb.current = onResult;
   useEffect(() => {
-    let stopped = false;
-    let scanner: { stop: () => Promise<void>; clear: () => void } | null = null;
-    import("html5-qrcode").then(async ({ Html5Qrcode }) => {
-      if (stopped) return;
-      const s = new Html5Qrcode("qr-reader");
-      scanner = s;
+    let cancelled = false;
+    let done = false;
+    type S = { start: (...a: unknown[]) => Promise<unknown>; stop: () => Promise<void>; isScanning: boolean; clear: () => void };
+    let scanner: S | null = null;
+    let startPromise: Promise<unknown> | null = null;
+    const stop = async () => {
       try {
-        await s.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 220 },
-          (text) => {
-            if (stopped) return;
-            stopped = true;
-            s.stop().finally(() => onResult(text));
-          },
-          () => {},
-        );
+        await startPromise?.catch(() => {});
+        if (scanner?.isScanning) await scanner.stop();
+        scanner?.clear();
       } catch {
-        setError("Camera unavailable. Allow camera access, or search by member ID instead.");
+        /* already stopped */
       }
-    });
-    return () => {
-      stopped = true;
-      scanner?.stop().catch(() => {});
     };
-  }, [onResult]);
+    (async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError("This browser can't open the camera here. Search by member ID instead.");
+        setStarting(false);
+        return;
+      }
+      const { Html5Qrcode } = await import("html5-qrcode");
+      if (cancelled) return;
+      scanner = new Html5Qrcode("qr-reader", { verbose: false }) as unknown as S;
+      startPromise = scanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: (w: number, h: number) => {
+            const size = Math.max(150, Math.floor(Math.min(w, h) * 0.7));
+            return { width: size, height: size };
+          },
+        },
+        (text: string) => {
+          if (done || cancelled) return;
+          done = true;
+          stop().finally(() => cb.current(text));
+        },
+        () => {},
+      );
+      try {
+        await startPromise;
+        if (!cancelled) setStarting(false);
+      } catch (e) {
+        if (cancelled) return;
+        setStarting(false);
+        const msg = String((e as Error)?.message ?? e);
+        setError(
+          /Permission|NotAllowed/i.test(msg)
+            ? "Camera permission was blocked. Allow camera access in your browser settings, then try again."
+            : /NotFound|Requested device/i.test(msg)
+              ? "No camera found on this device. Search by member ID instead."
+              : "Camera unavailable. Close other apps using the camera, or search by member ID.",
+        );
+      }
+    })();
+    return () => {
+      cancelled = true;
+      void stop();
+    };
+  }, []);
   return (
-    <div className="panel mt-4 p-4">
+    <div className="panel mt-4 animate-pop p-4">
       <div className="mb-3 flex items-center justify-between">
         <p className="text-sm font-medium">Point the camera at the member's pass</p>
         <Button variant="ghost" size="sm" onClick={onClose}>
           Close
         </Button>
       </div>
-      <div id="qr-reader" className="mx-auto max-w-sm overflow-hidden rounded-lg bg-muted" />
+      <div
+        id="qr-reader"
+        className="mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-lg bg-muted"
+      />
+      {starting && !error && (
+        <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> Starting camera…
+        </p>
+      )}
       {error && <p className="mt-3 text-sm text-danger">{error}</p>}
     </div>
   );

@@ -51,7 +51,7 @@ function Overview() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="stagger grid grid-cols-2 gap-3 lg:grid-cols-5">
         {o ? (
           <>
             <Stat
@@ -78,7 +78,7 @@ function Overview() {
         )}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+      <div className="stagger mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         {me?.isAdmin && (
           <section className="panel">
             <div className="flex items-center justify-between border-b px-5 py-4">

@@ -50,7 +50,7 @@ function Verify() {
     try {
       const items = await searchMembers(t);
       if (items.length === 0) setState({ kind: "not_found", q: t });
-      else if (items.length === 1) await check(items[0].id);
+      else if (items.length === 1 && items[0]) await check(items[0].id);
       else setState({ kind: "matches", items });
     } catch (e) {
       setState({ kind: "error", message: (e as Error).message, retry: () => search(t) });

@@ -44,7 +44,7 @@ function Plans() {
   const save = useMutation({
     mutationFn: async () => {
       const p = schema.safeParse(form);
-      if (!p.success) throw new Error(p.error.issues[0].message);
+      if (!p.success) throw new Error(p.error.issues[0]?.message ?? "Invalid plan");
       await savePlan({ ...p.data, id: form?.id });
     },
     onSuccess: () => {

@@ -40,6 +40,7 @@ function Dashboard() {
   const periods = useQuery({ ...myPeriodsQuery(uid), enabled: !!uid });
   const payments = useQuery({ ...memberPaymentsQuery(uid), enabled: !!uid });
   const { data: settings } = useQuery(settingsQuery);
+  const pass = useQuery(myPassQuery);
 
   if (status.isError) return <ErrorState error={status.error} onRetry={() => status.refetch()} />;
   if (!status.data || !me) return <DashboardSkeleton />;

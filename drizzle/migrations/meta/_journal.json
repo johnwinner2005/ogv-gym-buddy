@@ -15,6 +15,13 @@
       "when": 1791971729584,
       "tag": "0001_receipts_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791972358134,
+      "tag": "0002_staff_member_status",
+      "breakpoints": true
     }
   ]
 }

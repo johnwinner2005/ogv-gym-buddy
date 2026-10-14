@@ -430,3 +430,10 @@ export const staffQuery = queryOptions({
     return profiles.map((p) => ({ ...p, roles: roles.filter((r) => r.user_id === p.id).map((r) => r.role) }));
   },
 });
+
+/** Staff read of a member's live status without recording an entry check. */
+export const memberStatusQuery = (id: string) =>
+  queryOptions({
+    queryKey: ["admin", "member-status", id],
+    queryFn: async () => unwrap<StatusResult>(await supabase.rpc("staff_member_status", { _member: id })),
+  });

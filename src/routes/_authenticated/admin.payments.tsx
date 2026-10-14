@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { ExternalLink, FileText, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import { approvePayment, paymentQueueQuery, plansQuery, receiptUrl, reviewPayment, verifyMember } from "@/lib/api";
+import { approvePayment, memberStatusQuery, paymentQueueQuery, plansQuery, receiptUrl, reviewPayment } from "@/lib/api";
 import { describeDuration } from "@/lib/membership";
 import { errMessage, fmtDate, fmtDateTime, fmtLongDate, naira, relative } from "@/lib/format";
 import { EmptyState, ErrorState, PageHeader, StatusBadge } from "@/components/status";
@@ -100,15 +100,11 @@ function Review({ row, onClose }: { row: Row; onClose: () => void }) {
   const [urlErr, setUrlErr] = useState("");
   const open = row.status === "pending" || row.status === "clarification";
   const plan = plans.data?.find((p) => p.id === planId);
-  const [current, setCurrent] = useState<{ status: string; expires_at: string | null } | null>(null);
+  const { data: current } = useQuery(memberStatusQuery(row.member_id));
 
   useEffect(() => {
     if (row.receipt_path) receiptUrl(row.receipt_path).then(setUrl).catch((e) => setUrlErr(errMessage(e)));
   }, [row.receipt_path]);
-  useEffect(() => {
-    // Read-only status for context; this records a verification log entry, so only fetch for open requests.
-    if (open) verifyMember(row.member_id).then((r) => setCurrent({ status: r.status, expires_at: r.expires_at })).catch(() => {});
-  }, [row.member_id, open]);
 
   const done = (msg: string) => {
     toast.success(msg);

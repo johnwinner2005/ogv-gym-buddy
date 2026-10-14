@@ -469,6 +469,7 @@ export type Database = {
           photo_url: string
         }[]
       }
+      staff_member_status: { Args: { _member: string }; Returns: Json }
       sync_my_notices: { Args: never; Returns: undefined }
       update_my_profile: {
         Args: { _full_name: string; _phone: string }

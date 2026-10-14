@@ -9,7 +9,7 @@ import {
   meQuery,
   memberPaymentsQuery,
   memberProfileQuery,
-  membersQuery,
+  memberStatusQuery,
   myPeriodsQuery,
   plansQuery,
   previewPeriod,
@@ -35,7 +35,7 @@ function MemberDetail() {
   const { data: me } = useQuery(meQuery);
   const profile = useQuery(memberProfileQuery(id));
   const p = profile.data?.profile;
-  const row = useQuery({ ...membersQuery(p?.member_code ?? "", "all", 0, 20), enabled: !!p });
+  const { data: status } = useQuery(memberStatusQuery(id));
   const periods = useQuery(myPeriodsQuery(id));
   const payments = useQuery({ ...memberPaymentsQuery(id), enabled: !!me?.isAdmin });
   const audit = useQuery({ ...auditQuery(id, 0), enabled: !!me?.isAdmin });
@@ -44,7 +44,6 @@ function MemberDetail() {
   if (profile.isError) return <ErrorState error={profile.error} onRetry={() => profile.refetch()} />;
   if (profile.isLoading) return <Loader2 className="mx-auto mt-20 animate-spin text-muted-foreground" />;
   if (!p) return <EmptyState title="Member not found" />;
-  const status = row.data?.find((r) => r.id === id);
 
   return (
     <div className="animate-rise">

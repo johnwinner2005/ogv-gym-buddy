@@ -267,7 +267,7 @@ function ReplaceDialog({ open, onClose }: { open: boolean; onClose: () => void }
   const m = useMutation({
     mutationFn: () => replacePass(me!.user.id, reason),
     onSuccess: () => {
-      toast.success("New pass ready. Add it to your Wallet again.");
+      toast.success("New pass ready. Save the new image to your phone.");
       qc.invalidateQueries({ queryKey: ["my-pass"] });
       setReason("");
       onClose();
@@ -280,7 +280,7 @@ function ReplaceDialog({ open, onClose }: { open: boolean; onClose: () => void }
         <DialogHeader>
           <DialogTitle>Replace my pass?</DialogTitle>
           <DialogDescription>
-            Your current QR code and any Wallet passes stop working immediately. Your member ID and
+            Your current QR code and any saved pass pictures stop working immediately. Your member ID and
             membership stay the same.
           </DialogDescription>
         </DialogHeader>

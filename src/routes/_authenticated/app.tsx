@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { History, Home, RefreshCw, UserRound } from "lucide-react";
+import { History, Home, QrCode, RefreshCw, UserRound } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { AppShell } from "@/components/shell";
@@ -21,6 +21,7 @@ function MemberLayout() {
       area="member"
       nav={[
         { to: "/app", label: "Dashboard", icon: Home, exact: true },
+        { to: "/app/pass", label: "My access pass", icon: QrCode },
         { to: "/app/renew", label: firstTime ? "Activate membership" : "Renew membership", icon: RefreshCw },
         { to: "/app/history", label: "Payments & history", icon: History },
         { to: "/app/profile", label: "Profile", icon: UserRound },

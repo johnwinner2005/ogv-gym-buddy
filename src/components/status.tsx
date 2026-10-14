@@ -106,6 +106,20 @@ export const DECISION: Record<
     surface: "bg-muted text-foreground border border-border",
     allowed: false,
   },
+  invalid_pass: {
+    title: "Invalid pass",
+    detail: "This code isn't a valid OGV Gym pass. Entry is denied. Search by name or member ID instead.",
+    icon: UserX,
+    surface: "bg-danger text-primary-foreground",
+    allowed: false,
+  },
+  revoked_pass: {
+    title: "Pass replaced",
+    detail: "This pass was revoked (lost or replaced phone). Entry is denied — ask the member to open their current pass.",
+    icon: ShieldX,
+    surface: "bg-danger text-primary-foreground",
+    allowed: false,
+  },
   error: {
     title: "Unable to verify",
     detail:

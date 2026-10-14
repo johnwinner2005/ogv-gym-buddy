@@ -25,10 +25,18 @@ export interface StatusResult {
   checked_at: string;
 }
 export type Decision =
-  "granted" | "expired" | "suspended" | "cancelled" | "no_membership" | "not_found";
+  | "granted"
+  | "expired"
+  | "suspended"
+  | "cancelled"
+  | "no_membership"
+  | "not_found"
+  | "invalid_pass"
+  | "revoked_pass";
 export interface VerifyResult extends StatusResult {
   decision: Decision;
   last_verified: string | null;
+  last_payment?: { amount: number; plan: string | null; approved_at: string } | null;
 }
 
 export interface Plan {
@@ -541,3 +549,29 @@ export const checkInsQuery = (memberId: string | null, page = 0) =>
       return { rows: res.data, count: res.count ?? 0, people: map };
     },
   });
+
+/* ---------- Access pass (permanent identity credential, separate from membership status) ---------- */
+export interface MyPass {
+  member_code: string;
+  full_name: string;
+  photo_url: string | null;
+  member_since: string;
+  token: string;
+  credential_id: string;
+  issued_at: string;
+  status: MembershipStatus;
+  plan_name: string | null;
+  pending_requests: number;
+  wallet: { provider: "apple" | "google"; status: string; last_issued_at: string }[];
+}
+export const myPassQuery = queryOptions({
+  queryKey: ["my-pass"],
+  queryFn: async () => unwrap<MyPass>(await supabase.rpc("get_my_pass")),
+  staleTime: 30_000,
+});
+export async function replacePass(memberId: string, reason: string) {
+  unwrap(await supabase.rpc("rotate_credential", { _member: memberId, _reason: reason }));
+}
+export async function verifyPass(token: string) {
+  return unwrap<VerifyResult>(await supabase.rpc("verify_pass", { _token: token }));
+}

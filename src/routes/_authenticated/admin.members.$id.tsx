@@ -13,6 +13,7 @@ import {
   myPeriodsQuery,
   plansQuery,
   previewPeriod,
+  replacePass,
   setAccessState,
 } from "@/lib/api";
 import type { DurationUnit } from "@/lib/membership";
@@ -111,6 +112,7 @@ function MemberDetail() {
                 Lift {p.access_state === "suspended" ? "suspension" : "cancellation"}
               </Button>
             )}
+            <ReplacePassButton memberId={id} />
           </div>
         )}
       </div>
@@ -435,5 +437,53 @@ function AccessDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ReplacePassButton({ memberId }: { memberId: string }) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const m = useMutation({
+    mutationFn: () => replacePass(memberId, reason),
+    onSuccess: () => {
+      toast.success("Access pass replaced. The old pass no longer works.");
+      setOpen(false);
+      setReason("");
+    },
+    onError: (e) => toast.error(errMessage(e)),
+  });
+  return (
+    <>
+      <Button variant="ghost" onClick={() => setOpen(true)}>
+        Replace access pass
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Replace access pass</DialogTitle>
+            <DialogDescription>
+              Use this for a lost phone or a shared pass. The current QR code and any Wallet passes
+              stop working immediately. Membership dates are not affected.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="rp-reason">Reason</Label>
+            <Textarea id="rp-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Keep current pass
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={reason.trim().length < 3 || m.isPending}
+              onClick={() => m.mutate()}
+            >
+              {m.isPending && <Loader2 className="animate-spin" />} Replace pass
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

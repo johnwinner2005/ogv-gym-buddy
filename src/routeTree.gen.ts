@@ -30,10 +30,12 @@ import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminVerifyRouteImport } from './routes/_authenticated/admin.verify'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppHistoryRouteImport } from './routes/_authenticated/app.history'
+import { Route as AuthenticatedAppPassRouteImport } from './routes/_authenticated/app.pass'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppRenewRouteImport } from './routes/_authenticated/app.renew'
 import { Route as AuthenticatedAdminMembersIndexRouteImport } from './routes/_authenticated/admin.members.index'
 import { Route as AuthenticatedAdminMembersIdRouteImport } from './routes/_authenticated/admin.members.$id'
+import { Route as ApiPublicWalletAppleRouteImport } from './routes/api/public/wallet.apple'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -146,6 +148,11 @@ const AuthenticatedAppHistoryRoute = AuthenticatedAppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppPassRoute = AuthenticatedAppPassRouteImport.update({
+  id: '/pass',
+  path: '/pass',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -168,6 +175,11 @@ const AuthenticatedAdminMembersIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedAdminMembersRoute,
   } as any)
+const ApiPublicWalletAppleRoute = ApiPublicWalletAppleRouteImport.update({
+  id: '/api/public/wallet/apple',
+  path: '/api/public/wallet/apple',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -188,11 +200,13 @@ export interface FileRoutesByFullPath {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
+  '/app/pass': typeof AuthenticatedAppPassRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/renew': typeof AuthenticatedAppRenewRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/admin/members/': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -211,11 +225,13 @@ export interface FileRoutesByTo {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
+  '/app/pass': typeof AuthenticatedAppPassRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/renew': typeof AuthenticatedAppRenewRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/admin/members': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRoutesById {
@@ -239,11 +255,13 @@ export interface FileRoutesById {
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/_authenticated/app/history': typeof AuthenticatedAppHistoryRoute
+  '/_authenticated/app/pass': typeof AuthenticatedAppPassRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/renew': typeof AuthenticatedAppRenewRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/members/$id': typeof AuthenticatedAdminMembersIdRoute
+  '/api/public/wallet/apple': typeof ApiPublicWalletAppleRoute
   '/_authenticated/admin/members/': typeof AuthenticatedAdminMembersIndexRoute
 }
 export interface FileRouteTypes {
@@ -267,11 +285,13 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
+    | '/app/pass'
     | '/app/profile'
     | '/app/renew'
     | '/admin/'
     | '/app/'
     | '/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/admin/members/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -290,11 +310,13 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
+    | '/app/pass'
     | '/app/profile'
     | '/app/renew'
     | '/admin'
     | '/app'
     | '/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/admin/members'
   id:
     | '__root__'
@@ -317,11 +339,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/verify'
     | '/_authenticated/app/history'
+    | '/_authenticated/app/pass'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/renew'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/admin/members/$id'
+    | '/api/public/wallet/apple'
     | '/_authenticated/admin/members/'
   fileRoutesById: FileRoutesById
 }
@@ -332,6 +356,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicWalletAppleRoute: typeof ApiPublicWalletAppleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -483,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHistoryRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/pass': {
+      id: '/_authenticated/app/pass'
+      path: '/pass'
+      fullPath: '/app/pass'
+      preLoaderRoute: typeof AuthenticatedAppPassRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/profile': {
       id: '/_authenticated/app/profile'
       path: '/profile'
@@ -510,6 +542,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/members/$id'
       preLoaderRoute: typeof AuthenticatedAdminMembersIdRouteImport
       parentRoute: typeof AuthenticatedAdminMembersRoute
+    }
+    '/api/public/wallet/apple': {
+      id: '/api/public/wallet/apple'
+      path: '/api/public/wallet/apple'
+      fullPath: '/api/public/wallet/apple'
+      preLoaderRoute: typeof ApiPublicWalletAppleRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -563,6 +602,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppHistoryRoute: typeof AuthenticatedAppHistoryRoute
+  AuthenticatedAppPassRoute: typeof AuthenticatedAppPassRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppRenewRoute: typeof AuthenticatedAppRenewRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -570,6 +610,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppHistoryRoute: AuthenticatedAppHistoryRoute,
+  AuthenticatedAppPassRoute: AuthenticatedAppPassRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppRenewRoute: AuthenticatedAppRenewRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
@@ -598,6 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicWalletAppleRoute: ApiPublicWalletAppleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

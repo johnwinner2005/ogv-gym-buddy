@@ -13,6 +13,7 @@ import {
   meQuery,
   memberPaymentsQuery,
   myPeriodsQuery,
+  myPassQuery,
   myStatusQuery,
   settingsQuery,
 } from "@/lib/api";
@@ -40,6 +41,7 @@ function Dashboard() {
   const periods = useQuery({ ...myPeriodsQuery(uid), enabled: !!uid });
   const payments = useQuery({ ...memberPaymentsQuery(uid), enabled: !!uid });
   const { data: settings } = useQuery(settingsQuery);
+  const pass = useQuery(myPassQuery);
 
   if (status.isError) return <ErrorState error={status.error} onRetry={() => status.refetch()} />;
   if (!status.data || !me) return <DashboardSkeleton />;
@@ -203,15 +205,22 @@ function Dashboard() {
 
         {/* Pass */}
         <section className="panel flex flex-col items-center p-6 text-center">
-          <p className="eyebrow self-start">Member pass</p>
+          <p className="eyebrow self-start">My access pass</p>
           <div className="mt-4 rounded-lg border bg-card p-3">
-            <QRCodeSVG value={`OGV:${s.member_id}`} size={148} level="M" />
+            {pass.data ? (
+              <QRCodeSVG value={pass.data.token} size={148} level="M" />
+            ) : (
+              <Skeleton className="size-[148px]" />
+            )}
           </div>
           <p className="mt-3 font-mono text-lg font-medium">{s.member_code}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Show this at the front desk. Staff check your live status — the code alone doesn't grant
-            entry.
+            Your access pass stays in your Wallet. Gym entry is subject to your current membership
+            status.
           </p>
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <Link to="/app/pass">Add to Wallet</Link>
+          </Button>
         </section>
       </div>
 

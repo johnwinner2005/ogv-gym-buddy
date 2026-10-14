@@ -18,3 +18,5 @@
 - Gym entry is recorded only via `admit_member` (re-checks live status) into `check_ins`.
 - Receipts are in the private `receipts` bucket under `<member_id>/…`; admins read via short-lived signed URLs.
 - Server-side rule tests: `supabase/tests/membership_rules.sql` (rolls back); unit tests: `bunx vitest run`.
+- Access pass: permanent UID is `profiles.member_code`; the QR carries only an opaque `member_credentials.token` (one active per member, revocable via `rotate_credential`). Reception resolves it only through `verify_pass`, which re-checks live status — pass lifetime never affects access.
+- Wallet issuance is server-only (`src/lib/wallet.server.ts`): Apple .pkpass signed with node-forge and served from `/api/public/wallet/apple` behind a 5-minute HMAC link; Google uses a signed save JWT (Generic pass). Pass tests: `supabase/tests/access_pass.sql`.

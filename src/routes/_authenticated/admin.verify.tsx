@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, DoorOpen, Loader2, RotateCcw, Search, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { admitMember, searchMembers, verifyMember, type VerifyResult } from "@/lib/api";
+import { admitMember, searchMembers, verifyMember, verifyPass, type VerifyResult } from "@/lib/api";
 import { errMessage, fmtDateTime, fmtLongDate, fmtTime, initials, relative } from "@/lib/format";
 import { DECISION, StatusBadge } from "@/components/status";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ type State =
   | { kind: "matches"; items: Match[] }
   | { kind: "result"; data: VerifyResult }
   | { kind: "not_found"; q: string }
+  | { kind: "bad_pass"; decision: "invalid_pass" | "revoked_pass" }
   | { kind: "error"; message: string; retry: () => void };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,6 +34,18 @@ function Verify() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => inputRef.current?.focus(), []);
+
+  async function checkPass(token: string) {
+    setState({ kind: "loading" });
+    try {
+      const data = await verifyPass(token);
+      if (data.decision === "invalid_pass" || data.decision === "revoked_pass")
+        setState({ kind: "bad_pass", decision: data.decision });
+      else setState({ kind: "result", data });
+    } catch (e) {
+      setState({ kind: "error", message: (e as Error).message, retry: () => checkPass(token) });
+    }
+  }
 
   async function check(id: string) {
     setState({ kind: "loading" });
@@ -61,8 +74,10 @@ function Verify() {
 
   function onScan(text: string) {
     setScanning(false);
-    const id = text.startsWith("OGV:") ? text.slice(4) : text;
-    if (UUID.test(id)) check(id);
+    const t = text.trim();
+    // Wallet / web passes carry an opaque credential; only the server can resolve it.
+    if (t.startsWith("OGV1.")) checkPass(t);
+    else if (t.startsWith("OGV:") || UUID.test(t)) setState({ kind: "bad_pass", decision: "invalid_pass" });
     else {
       setQ(text);
       search(text);
@@ -169,6 +184,7 @@ function Verify() {
           </div>
         )}
         {state.kind === "not_found" && <DecisionBanner decision="not_found" onReset={reset} />}
+        {state.kind === "bad_pass" && <DecisionBanner decision={state.decision} onReset={reset} />}
         {state.kind === "error" && (
           <DecisionBanner
             decision="error"
@@ -301,8 +317,10 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Phone</dt>
-            <dd className="mt-0.5 font-medium">{data.phone || "—"}</dd>
+            <dt className="text-xs text-muted-foreground">Last approved payment</dt>
+            <dd className="mt-0.5 font-medium">
+              {data.last_payment ? fmtLongDate(data.last_payment.approved_at) : "—"}
+            </dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Last checked</dt>
@@ -320,7 +338,8 @@ function Result({ data, onReset }: { data: VerifyResult; onReset: () => void }) 
             )}
             {data.pending_requests > 0 && (
               <p className="rounded-md bg-warning-soft px-3 py-2 text-sm text-warning-foreground">
-                A renewal payment is awaiting verification. It does not grant entry until approved.
+                <strong>Payment pending</strong> — a renewal is awaiting admin review. Entry follows
+                the verified membership above, not the pending payment.
               </p>
             )}
           </div>

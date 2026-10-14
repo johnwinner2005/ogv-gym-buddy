@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminVerifyRouteImport } from './routes/_authenticated/admin.verify'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppHistoryRouteImport } from './routes/_authenticated/app.history'
+import { Route as AuthenticatedAppPassRouteImport } from './routes/_authenticated/app.pass'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppRenewRouteImport } from './routes/_authenticated/app.renew'
 import { Route as AuthenticatedAdminMembersIndexRouteImport } from './routes/_authenticated/admin.members.index'
@@ -147,6 +148,11 @@ const AuthenticatedAppHistoryRoute = AuthenticatedAppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppPassRoute = AuthenticatedAppPassRouteImport.update({
+  id: '/pass',
+  path: '/pass',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
+  '/app/pass': typeof AuthenticatedAppPassRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/renew': typeof AuthenticatedAppRenewRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/app/history': typeof AuthenticatedAppHistoryRoute
+  '/app/pass': typeof AuthenticatedAppPassRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/renew': typeof AuthenticatedAppRenewRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/verify': typeof AuthenticatedAdminVerifyRoute
   '/_authenticated/app/history': typeof AuthenticatedAppHistoryRoute
+  '/_authenticated/app/pass': typeof AuthenticatedAppPassRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/renew': typeof AuthenticatedAppRenewRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
+    | '/app/pass'
     | '/app/profile'
     | '/app/renew'
     | '/admin/'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/verify'
     | '/app/history'
+    | '/app/pass'
     | '/app/profile'
     | '/app/renew'
     | '/admin'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/verify'
     | '/_authenticated/app/history'
+    | '/_authenticated/app/pass'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/renew'
     | '/_authenticated/admin/'
@@ -496,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHistoryRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/pass': {
+      id: '/_authenticated/app/pass'
+      path: '/pass'
+      fullPath: '/app/pass'
+      preLoaderRoute: typeof AuthenticatedAppPassRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/profile': {
       id: '/_authenticated/app/profile'
       path: '/profile'
@@ -583,6 +602,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppHistoryRoute: typeof AuthenticatedAppHistoryRoute
+  AuthenticatedAppPassRoute: typeof AuthenticatedAppPassRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppRenewRoute: typeof AuthenticatedAppRenewRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -590,6 +610,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppHistoryRoute: AuthenticatedAppHistoryRoute,
+  AuthenticatedAppPassRoute: AuthenticatedAppPassRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppRenewRoute: AuthenticatedAppRenewRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,

@@ -112,11 +112,11 @@ export function buildPkpass(d: PassData): Uint8Array {
   p7.addSigner({
     key,
     certificate: cert,
-    digestAlgorithm: forge.pki.oids.sha256,
+    digestAlgorithm: forge.pki.oids.sha256!,
     authenticatedAttributes: [
-      { type: forge.pki.oids.contentType, value: forge.pki.oids.data },
-      { type: forge.pki.oids.messageDigest },
-      { type: forge.pki.oids.signingTime, value: new Date() as unknown as string },
+      { type: forge.pki.oids.contentType!, value: forge.pki.oids.data! },
+      { type: forge.pki.oids.messageDigest! },
+      { type: forge.pki.oids.signingTime!, value: new Date() as unknown as string },
     ],
   });
   p7.sign({ detached: true });

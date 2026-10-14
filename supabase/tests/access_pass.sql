@@ -14,7 +14,7 @@ BEGIN
   PERFORM set_config('request.jwt.claims', json_build_object('sub', staff, 'role','authenticated')::text, true);
   r := public.verify_pass(tok);
   ASSERT r->>'member_id' = m::text, 'resolves to member';
-  ASSERT r->>'decision' = CASE (public.compute_status(m)->>'status') WHEN 'active' THEN 'granted' WHEN 'expired' THEN 'expired' WHEN 'suspended' THEN 'suspended' WHEN 'cancelled' THEN 'cancelled' ELSE 'no_membership' END, 'live status decides';
+  ASSERT r->>'decision' = CASE (public.staff_member_status(m)->>'status') WHEN 'active' THEN 'granted' WHEN 'expired' THEN 'expired' WHEN 'suspended' THEN 'suspended' WHEN 'cancelled' THEN 'cancelled' ELSE 'no_membership' END, 'live status decides';
   ASSERT public.verify_pass('OGV1.nope')->>'decision' = 'invalid_pass', 'unknown denied';
   -- expired member keeps pass but is denied
   UPDATE public.profiles SET access_state='suspended' WHERE id=m;

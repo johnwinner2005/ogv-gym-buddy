@@ -13,6 +13,7 @@ import {
   meQuery,
   memberPaymentsQuery,
   myPeriodsQuery,
+  myPassQuery,
   myStatusQuery,
   settingsQuery,
 } from "@/lib/api";
